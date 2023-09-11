@@ -14,9 +14,9 @@ type client struct {
 	serviceURL string
 }
 
-func New(serviceUrl string) Client {
+func New(serviceURL string) Client {
 	return &client{
-		serviceURL: serviceUrl,
+		serviceURL: serviceURL,
 	}
 }
 
