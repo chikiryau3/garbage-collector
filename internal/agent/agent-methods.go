@@ -2,6 +2,7 @@ package agent
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/rand"
 	"runtime"
 	"strings"
@@ -12,23 +13,23 @@ import (
 // не уверен в том, что это нормально перформит, но не хотелось вручную все метрики разбирать
 func filterFields(data interface{}) (map[string]any, error) {
 	var stats RuntimeMetrics
-	statsJson, err := json.Marshal(data)
+	statsJSON, err := json.Marshal(data)
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.Unmarshal(statsJson, &stats)
+	err = json.Unmarshal(statsJSON, &stats)
 	if err != nil {
 		return nil, err
 	}
 
 	var filteredMap map[string]any
-	statsJson, err = json.Marshal(stats)
+	statsJSON, err = json.Marshal(stats)
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.Unmarshal(statsJson, &filteredMap)
+	err = json.Unmarshal(statsJSON, &filteredMap)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +107,7 @@ func (a *agent) sendReport() error {
 		if metricType == `gauge` {
 			metricValue, ok := metricValueRaw.(float64)
 			if !ok {
-				return err
+				return fmt.Errorf("metric %s has wrong type, value %T", metricName, metricValueRaw)
 			}
 			err := a.collectionServiceClient.Gauge(metricName, metricValue)
 			if err != nil {
@@ -117,7 +118,7 @@ func (a *agent) sendReport() error {
 		if metricType == `count` {
 			metricValue, ok := metricValueRaw.(int64)
 			if !ok {
-				return err
+				return fmt.Errorf("metric %s has wrong type, value %T", metricName, metricValueRaw)
 			}
 			err := a.collectionServiceClient.Counter(metricName, metricValue)
 			if err != nil {
