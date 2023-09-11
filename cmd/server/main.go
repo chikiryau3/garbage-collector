@@ -1,8 +1,8 @@
 package main
 
 import (
-	memStorage "github.com/chikiryau3/garbage-collector/internal/mem-storage"
-	metrics_collector "github.com/chikiryau3/garbage-collector/internal/metrics-collector"
+	"github.com/chikiryau3/garbage-collector/internal/memStorage"
+	"github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	"github.com/ucarion/urlpath"
 	"net/http"
 )
@@ -13,11 +13,11 @@ type Service interface {
 }
 
 type service struct {
-	collector metrics_collector.MetricsCollector
+	collector metricsCollector.MetricsCollector
 	endpoints map[string]endpoint
 }
 
-func New(collector metrics_collector.MetricsCollector, endpoints endpoints) Service {
+func New(collector metricsCollector.MetricsCollector, endpoints endpoints) Service {
 	return &service{
 		collector: collector,
 		endpoints: endpoints,
@@ -33,8 +33,8 @@ type endpoints map[string]endpoint
 
 func main() {
 	storage := memStorage.New()
-	metricsCollector := metrics_collector.New(storage)
-	service := New(metricsCollector, map[string]endpoint{
+	collector := metricsCollector.New(storage)
+	service := New(collector, map[string]endpoint{
 		`gauge`: {
 			path:        `/update/gauge/`,
 			pathPattern: urlpath.New(`/update/gauge/:metricName/:metricValue`),

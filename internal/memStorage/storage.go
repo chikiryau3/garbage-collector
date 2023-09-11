@@ -1,4 +1,4 @@
-package mem_storage
+package memStorage
 
 type MemStorage interface {
 	WriteMetric(name string, value any) error
@@ -22,5 +22,7 @@ func (s *storage) ReadMetric(name string) (any, bool) {
 }
 
 func New() MemStorage {
-	return &storage{}
+	return &storage{
+		data: map[string]any{},
+	}
 }

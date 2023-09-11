@@ -1,4 +1,4 @@
-package metrics_collector
+package metricsCollector
 
 import (
 	"fmt"

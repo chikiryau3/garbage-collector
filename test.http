@@ -1,5 +1,5 @@
 ### counter valid
-POST /update/counter/someMetric/527 HTTP/1.1
+POST /update/counter/testCounter/100 HTTP/1.1
 Host: localhost:8080
 Content-Length: 0
 Content-Type: text/plain

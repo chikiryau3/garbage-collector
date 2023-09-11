@@ -1,6 +1,6 @@
-package metrics_collector
+package metricsCollector
 
-import "github.com/chikiryau3/garbage-collector/internal/mem-storage"
+import "github.com/chikiryau3/garbage-collector/internal/memStorage"
 
 type MetricsCollector interface {
 	Gauge(name string, value float64) error
@@ -8,10 +8,10 @@ type MetricsCollector interface {
 }
 
 type metricsCollector struct {
-	storage mem_storage.MemStorage
+	storage memStorage.MemStorage
 }
 
-func New(storage mem_storage.MemStorage) MetricsCollector {
+func New(storage memStorage.MemStorage) MetricsCollector {
 	return &metricsCollector{
 		storage: storage,
 	}
