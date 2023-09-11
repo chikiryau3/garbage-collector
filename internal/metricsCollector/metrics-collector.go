@@ -5,6 +5,8 @@ import "github.com/chikiryau3/garbage-collector/internal/memStorage"
 type MetricsCollector interface {
 	Gauge(name string, value float64) error
 	Count(name string, value int64) error
+
+	ReadStorage() (*memstorage.StorageData, error)
 }
 
 type metricsCollector struct {
