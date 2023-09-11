@@ -1,4 +1,4 @@
-package metricsCollector
+package metricscollector
 
 import "github.com/chikiryau3/garbage-collector/internal/memStorage"
 
@@ -8,10 +8,10 @@ type MetricsCollector interface {
 }
 
 type metricsCollector struct {
-	storage memStorage.MemStorage
+	storage memstorage.MemStorage
 }
 
-func New(storage memStorage.MemStorage) MetricsCollector {
+func New(storage memstorage.MemStorage) MetricsCollector {
 	return &metricsCollector{
 		storage: storage,
 	}

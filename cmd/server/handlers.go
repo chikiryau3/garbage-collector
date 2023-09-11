@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 )
@@ -23,7 +22,7 @@ func (s *service) GaugeHandler(w http.ResponseWriter, r *http.Request) {
 	url := r.URL
 	match, ok := config.pathPattern.Match(url.Path)
 	if !ok {
-		fmt.Printf("BAD URL %s \n", url.Path)
+		//fmt.Printf("BAD URL %s \n", url.Path)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -34,7 +33,7 @@ func (s *service) GaugeHandler(w http.ResponseWriter, r *http.Request) {
 	metricValueRaw := match.Params[`metricValue`]
 	metricValueParsed, err := strconv.ParseFloat(metricValueRaw, 64)
 	if err != nil {
-		fmt.Printf("BAD METRIC VALUE %s \n", metricValueRaw)
+		//fmt.Printf("BAD METRIC VALUE %s \n", metricValueRaw)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -42,7 +41,7 @@ func (s *service) GaugeHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = s.collector.Gauge(metricName, metricValueParsed)
 	if err != nil {
-		fmt.Printf("COLLECTION ERROR %e \n", err)
+		//fmt.Printf("COLLECTION ERROR %e \n", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -63,7 +62,7 @@ func (s *service) CounterHandler(w http.ResponseWriter, r *http.Request) {
 	url := r.URL
 	match, ok := config.pathPattern.Match(url.Path)
 	if !ok {
-		fmt.Printf("BAD URL %s \n", url.Path)
+		//fmt.Printf("BAD URL %s \n", url.Path)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -74,7 +73,7 @@ func (s *service) CounterHandler(w http.ResponseWriter, r *http.Request) {
 	metricValueRaw := match.Params[`metricValue`]
 	metricValueParsed, err := strconv.ParseInt(metricValueRaw, 10, 64)
 	if err != nil {
-		fmt.Printf("BAD METRIC VALUE %s \n", metricValueRaw)
+		//fmt.Printf("BAD METRIC VALUE %s \n", metricValueRaw)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -82,7 +81,7 @@ func (s *service) CounterHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = s.collector.Count(metricName, metricValueParsed)
 	if err != nil {
-		fmt.Printf("COLLECTION ERROR %e \n", err)
+		//fmt.Printf("COLLECTION ERROR %e \n", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

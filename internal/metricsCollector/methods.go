@@ -1,11 +1,7 @@
-package metricsCollector
-
-import (
-	"fmt"
-)
+package metricscollector
 
 func (c *metricsCollector) Gauge(name string, value float64) error {
-	fmt.Printf("Gauge: %s %f \n", name, value)
+	//fmt.Printf("Gauge: %s %f \n", name, value)
 
 	_, ok := c.storage.ReadMetric(name)
 	// если метрика еще не представлена в storage
@@ -27,7 +23,7 @@ func (c *metricsCollector) Gauge(name string, value float64) error {
 }
 
 func (c *metricsCollector) Count(name string, value int64) error {
-	fmt.Printf("COUNT: %s %d \n", name, value)
+	//fmt.Printf("COUNT: %s %d \n", name, value)
 
 	currentValueRaw, ok := c.storage.ReadMetric(name)
 	// если метрика еще не представлена в storage, то пишем переданное значение
@@ -51,7 +47,7 @@ func (c *metricsCollector) Count(name string, value int64) error {
 		return nil
 	}
 
-	fmt.Printf("CURRENT VALUE %d", currentValue)
+	//fmt.Printf("CURRENT VALUE %d", currentValue)
 
 	err := c.storage.WriteMetric(name, value+currentValue)
 	if err != nil {

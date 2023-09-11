@@ -1,4 +1,4 @@
-package memStorage
+package memstorage
 
 type MemStorage interface {
 	WriteMetric(name string, value any) error

@@ -13,11 +13,11 @@ type Service interface {
 }
 
 type service struct {
-	collector metricsCollector.MetricsCollector
+	collector metricscollector.MetricsCollector
 	endpoints map[string]endpoint
 }
 
-func New(collector metricsCollector.MetricsCollector, endpoints endpoints) Service {
+func New(collector metricscollector.MetricsCollector, endpoints endpoints) Service {
 	return &service{
 		collector: collector,
 		endpoints: endpoints,
@@ -32,8 +32,8 @@ type endpoint struct {
 type endpoints map[string]endpoint
 
 func main() {
-	storage := memStorage.New()
-	collector := metricsCollector.New(storage)
+	storage := memstorage.New()
+	collector := metricscollector.New(storage)
 	service := New(collector, map[string]endpoint{
 		`gauge`: {
 			path:        `/update/gauge/`,
@@ -49,6 +49,10 @@ func main() {
 	//mux.HandleFunc(`/`, fn)
 	mux.HandleFunc(`/update/gauge/`, service.GaugeHandler)
 	mux.HandleFunc(`/update/counter/`, service.CounterHandler)
+	mux.HandleFunc(`/update/`, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	})
 
 	err := http.ListenAndServe(`:8080`, mux)
 	if err != nil {
