@@ -51,7 +51,6 @@ func main() {
 	mux.HandleFunc(`/update/counter/`, service.CounterHandler)
 	mux.HandleFunc(`/update/`, func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
-		return
 	})
 
 	err := http.ListenAndServe(`:8080`, mux)
