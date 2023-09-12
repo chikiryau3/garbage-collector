@@ -1,13 +1,20 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 )
 
+func (s *service) extractMetricData(ctx context.Context) MetricData {
+	mdata := ctx.Value(s.metricDataContextKey)
+
+	return mdata.(MetricData)
+}
+
 func (s *service) GaugeHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	metricName, metricValue, err := s.FormatGaugeInput(ctx.Value(`metricName`), ctx.Value(`metricValue`))
+	metricDataRaw := s.extractMetricData(r.Context())
+	metricName, metricValue, err := s.formatGaugeInput(metricDataRaw.name, metricDataRaw.value)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -26,8 +33,8 @@ func (s *service) GaugeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *service) CounterHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	metricName, metricValue, err := s.FormatCounterInput(ctx.Value(`metricName`), ctx.Value(`metricValue`))
+	metricDataRaw := s.extractMetricData(r.Context())
+	metricName, metricValue, err := s.formatCounterInput(metricDataRaw.name, metricDataRaw.value)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return

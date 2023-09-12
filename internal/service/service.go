@@ -15,22 +15,25 @@ type Service interface {
 
 	// middlewares
 
-	//MetricsCtx(next http.Handler) http.Handler
-	WithMetricName(next http.Handler) http.Handler
-	WithMetricValue(next http.Handler) http.Handler
-
-	// formatters
-
-	FormatGaugeInput(metricNameRaw any, metricValueRaw any) (string, float64, error)
-	FormatCounterInput(metricNameRaw any, metricValueRaw any) (string, int64, error)
+	WithMetricData(next http.Handler) http.Handler
 }
 
+type MetricData struct {
+	mtype string
+	name  string
+	value any
+}
+
+type mKey struct{}
+
 type service struct {
-	collector metricscollector.MetricsCollector
+	collector            metricscollector.MetricsCollector
+	metricDataContextKey struct{}
 }
 
 func New(collector metricscollector.MetricsCollector) Service {
 	return &service{
-		collector: collector,
+		collector:            collector,
+		metricDataContextKey: mKey{},
 	}
 }

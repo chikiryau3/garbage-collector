@@ -7,7 +7,7 @@ import (
 
 // такое можно сделать через дженерики, но пока не стал запариваться
 
-func (s *service) FormatGaugeInput(metricNameRaw any, metricValueRaw any) (string, float64, error) {
+func (s *service) formatGaugeInput(metricNameRaw any, metricValueRaw any) (string, float64, error) {
 	metricName := metricNameRaw.(string)
 	metricValueStr, ok := metricValueRaw.(string)
 	metricValueParsed, err := strconv.ParseFloat(metricValueStr, 64)
@@ -19,7 +19,7 @@ func (s *service) FormatGaugeInput(metricNameRaw any, metricValueRaw any) (strin
 	return metricName, metricValueParsed, nil
 }
 
-func (s *service) FormatCounterInput(metricNameRaw any, metricValueRaw any) (string, int64, error) {
+func (s *service) formatCounterInput(metricNameRaw any, metricValueRaw any) (string, int64, error) {
 	metricName := metricNameRaw.(string)
 	metricValueStr, ok := metricValueRaw.(string)
 	metricValueParsed, err := strconv.ParseInt(metricValueStr, 10, 64)

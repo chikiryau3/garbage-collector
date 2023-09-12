@@ -19,28 +19,26 @@ func main() {
 	router.Route(`/update`, func(r chi.Router) {
 		r.Route(`/gauge`, func(r chi.Router) {
 			r.Route(`/{metricName}/{metricValue}`, func(r chi.Router) {
-				r.Use(service.WithMetricName)
-				r.Use(service.WithMetricValue)
+				r.Use(service.WithMetricData)
 				r.Post(`/`, service.GaugeHandler)
 			})
 		})
 
 		r.Route(`/counter`, func(r chi.Router) {
 			r.Route(`/{metricName}/{metricValue}`, func(r chi.Router) {
-				r.Use(service.WithMetricName)
-				r.Use(service.WithMetricValue)
+				r.Use(service.WithMetricData)
 				r.Post(`/`, service.CounterHandler)
 			})
 		})
 
-		r.NotFound(func(w http.ResponseWriter, r *http.Request) {
+		r.Post(`/*`, func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 		})
 	})
 
 	router.Route(`/value`, func(r chi.Router) {
 		r.Route(`/{metricType}/{metricName}`, func(r chi.Router) {
-			r.Use(service.WithMetricName)
+			r.Use(service.WithMetricData)
 			r.Get(`/`, service.GetMetric)
 		})
 	})

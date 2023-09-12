@@ -6,21 +6,16 @@ import (
 	"net/http"
 )
 
-func (s *service) WithMetricName(next http.Handler) http.Handler {
+func (s *service) WithMetricData(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		metricName := chi.URLParam(r, `metricName`)
+		mdata := MetricData{
+			mtype: chi.URLParam(r, `metricType`),
+			name:  chi.URLParam(r, `metricName`),
+			value: chi.URLParam(r, `metricValue`),
+		}
 
-		ctx := context.WithValue(r.Context(), `metricName`, metricName)
-
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
-}
-
-func (s *service) WithMetricValue(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		metricValue := chi.URLParam(r, `metricValue`)
-
-		ctx := context.WithValue(r.Context(), `metricValue`, metricValue)
+		// https://gist.github.com/ww9/4ad7b2ddfb94816a30dfdf2218e02f48
+		ctx := context.WithValue(r.Context(), s.metricDataContextKey, mdata)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
