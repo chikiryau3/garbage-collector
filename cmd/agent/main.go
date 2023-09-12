@@ -18,7 +18,7 @@ type Args struct {
 }
 
 var args = &Args{
-	endpoint:       flag.String("a", "localhost:8080", "service endpoint"),
+	endpoint:       flag.String("a", "localhost:8081", "service endpoint"),
 	reportInterval: flag.Duration("r", 10, "report interval (seconds)"),
 	pollInterval:   flag.Duration("p", 2, "poll interval (seconds)"),
 }
