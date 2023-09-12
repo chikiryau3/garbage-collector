@@ -6,6 +6,7 @@ type MemStorage interface {
 	WriteMetric(name string, value any) error
 	ReadMetric(name string) (any, bool)
 	GetData() (*StorageData, error)
+	GetValue(name string) (any, bool)
 }
 
 type storage struct {
@@ -26,6 +27,11 @@ func (s *storage) ReadMetric(name string) (any, bool) {
 
 func (s *storage) GetData() (*StorageData, error) {
 	return &s.data, nil
+}
+
+func (s *storage) GetValue(name string) (any, bool) {
+	value, ok := s.data[name]
+	return value, ok
 }
 
 func New() MemStorage {

@@ -7,6 +7,7 @@ type MetricsCollector interface {
 	Count(name string, value int64) error
 
 	ReadStorage() (*memstorage.StorageData, error)
+	GetMetric(name string) (any, error)
 }
 
 type metricsCollector struct {

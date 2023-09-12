@@ -1,6 +1,9 @@
 package metricscollector
 
-import memstorage "github.com/chikiryau3/garbage-collector/internal/memStorage"
+import (
+	"fmt"
+	memstorage "github.com/chikiryau3/garbage-collector/internal/memStorage"
+)
 
 func (c *metricsCollector) Gauge(name string, value float64) error {
 	//fmt.Printf("Gauge: %s %f \n", name, value)
@@ -61,4 +64,13 @@ func (c *metricsCollector) Count(name string, value int64) error {
 
 func (c *metricsCollector) ReadStorage() (*memstorage.StorageData, error) {
 	return c.storage.GetData()
+}
+
+func (c *metricsCollector) GetMetric(name string) (any, error) {
+	metricValue, ok := c.storage.GetValue(name)
+	if !ok {
+		return nil, fmt.Errorf("unkonwn metric")
+	}
+
+	return metricValue, nil
 }
