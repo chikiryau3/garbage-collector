@@ -12,13 +12,13 @@ import (
 )
 
 type Args struct {
-	endpoint       *string
+	serverEndpoint *string
 	reportInterval *time.Duration
 	pollInterval   *time.Duration
 }
 
 var args = &Args{
-	endpoint:       flag.String("a", "localhost:45437", "service endpoint"),
+	serverEndpoint: flag.String("a", "localhost:45437", "service endpoint"),
 	reportInterval: flag.Duration("r", 10, "report interval (seconds)"),
 	pollInterval:   flag.Duration("p", 2, "poll interval (seconds)"),
 }
@@ -28,7 +28,7 @@ func main() {
 
 	storage := memstorage.New()
 	collector := metricscollector.New(storage)
-	collectionServiceClient := garbagecollector.New("http://localhost:8080")
+	collectionServiceClient := garbagecollector.New(*args.serverEndpoint)
 
 	metricsAgent := agent.New(
 		collector,
@@ -50,7 +50,7 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	err = http.ListenAndServe(*args.endpoint, mux)
+	err = http.ListenAndServe(`:8081`, mux)
 	if err != nil {
 		panic(err)
 	}

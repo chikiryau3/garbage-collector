@@ -2,10 +2,12 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/chikiryau3/garbage-collector/internal/memStorage"
 	"github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	service2 "github.com/chikiryau3/garbage-collector/internal/service"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"net/http"
 )
 
@@ -25,7 +27,7 @@ func main() {
 	service := service2.New(collector)
 
 	router := chi.NewRouter()
-	//router.Use(middleware.Logger)
+	router.Use(middleware.Logger)
 
 	router.Route(`/update`, func(r chi.Router) {
 		r.Route(`/gauge`, func(r chi.Router) {
@@ -56,6 +58,7 @@ func main() {
 
 	router.Get(`/`, service.GetMetricsHTML)
 
+	fmt.Printf("PORT %s", *args.endpoint)
 	err := http.ListenAndServe(*args.endpoint, router)
 	if err != nil {
 		panic(err)
