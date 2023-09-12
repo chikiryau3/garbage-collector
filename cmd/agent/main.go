@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/caarlos0/env/v9"
 	"github.com/chikiryau3/garbage-collector/internal/agent"
 	garbagecollector "github.com/chikiryau3/garbage-collector/internal/clients/garbage-collector"
 	memstorage "github.com/chikiryau3/garbage-collector/internal/memStorage"
@@ -12,9 +13,9 @@ import (
 )
 
 type Args struct {
-	serverEndpoint *string
-	reportInterval *time.Duration
-	pollInterval   *time.Duration
+	serverEndpoint *string        `env:"ADDRESS"`
+	reportInterval *time.Duration `env:"REPORT_INTERVAL"`
+	pollInterval   *time.Duration `env:"POLL_INTERVAL"`
 }
 
 var args = &Args{
@@ -25,6 +26,12 @@ var args = &Args{
 
 func main() {
 	flag.Parse()
+
+	if err := env.Parse(&args); err != nil {
+		fmt.Printf("%+v\n", err)
+	}
+
+	fmt.Printf("%+v\n", args)
 
 	storage := memstorage.New()
 	collector := metricscollector.New(storage)

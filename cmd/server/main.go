@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"github.com/caarlos0/env/v9"
 	"github.com/chikiryau3/garbage-collector/internal/memStorage"
 	"github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	service2 "github.com/chikiryau3/garbage-collector/internal/service"
@@ -12,7 +14,7 @@ import (
 )
 
 type Args struct {
-	endpoint *string
+	endpoint *string `env:"ADDRESS"`
 }
 
 var args = &Args{
@@ -21,6 +23,12 @@ var args = &Args{
 
 func main() {
 	flag.Parse()
+
+	if err := env.Parse(&args); err != nil {
+		fmt.Printf("%+v\n", err)
+	}
+
+	fmt.Printf("%+v\n", args)
 
 	storage := memstorage.New()
 	collector := metricscollector.New(storage)
@@ -60,7 +68,7 @@ func main() {
 
 	endpointParts := strings.Split(*args.endpoint, `:`)
 	port := `:` + endpointParts[len(endpointParts)-1]
-
+	println(port)
 	err := http.ListenAndServe(port, router)
 	if err != nil {
 		panic(err)
