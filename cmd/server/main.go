@@ -60,8 +60,8 @@ func main() {
 
 	endpointParts := strings.Split(*args.endpoint, `:`)
 	port := `:` + endpointParts[len(endpointParts)-1]
-
-	err := http.ListenAndServe(port, router)
+	server := &http.Server{Addr: port, Handler: router}
+	err := server.ListenAndServe()
 	if err != nil {
 		panic(err)
 	}
