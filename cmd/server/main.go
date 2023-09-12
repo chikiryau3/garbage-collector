@@ -2,32 +2,43 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"github.com/caarlos0/env/v9"
 	"github.com/chikiryau3/garbage-collector/internal/memStorage"
 	"github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	service2 "github.com/chikiryau3/garbage-collector/internal/service"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"net/http"
+	"os"
 )
 
-type Args struct {
-	endpoint *string `env:"ADDRESS"`
+type Config struct {
+	endpoint string
 }
 
-var args = &Args{
-	endpoint: flag.String("a", "localhost:8080", "service endpoint"),
+type CLIArgs struct {
+	endpoint *string
+}
+
+func loadConfig() *Config {
+	args := &CLIArgs{
+		endpoint: flag.String("a", "localhost:8080", "service endpoint"),
+	}
+
+	flag.Parse()
+
+	if endpoint, ok := os.LookupEnv(`ADDRESS`); ok {
+		return &Config{
+			endpoint: endpoint,
+		}
+	}
+
+	return &Config{
+		endpoint: *args.endpoint,
+	}
 }
 
 func main() {
-	flag.Parse()
-
-	if err := env.Parse(&args); err != nil {
-		fmt.Printf("%+v\n", err)
-	}
-
-	fmt.Printf("%+v\n", args)
+	config := loadConfig()
 
 	storage := memstorage.New()
 	collector := metricscollector.New(storage)
@@ -64,8 +75,8 @@ func main() {
 	})
 
 	router.Get(`/`, service.GetMetricsHTML)
-
-	err := http.ListenAndServe(*args.endpoint, router)
+	println(config.endpoint)
+	err := http.ListenAndServe(config.endpoint, router)
 	if err != nil {
 		panic(err)
 	}
