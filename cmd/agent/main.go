@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/chikiryau3/garbage-collector/internal/agent"
 	garbagecollector "github.com/chikiryau3/garbage-collector/internal/clients/garbage-collector"
@@ -10,12 +11,31 @@ import (
 	"time"
 )
 
+type Args struct {
+	endpoint       *string
+	reportInterval *time.Duration
+	pollInterval   *time.Duration
+}
+
+var args = &Args{
+	endpoint:       flag.String("a", "localhost:8080", "service endpoint"),
+	reportInterval: flag.Duration("r", 10, "report interval (seconds)"),
+	pollInterval:   flag.Duration("p", 2, "poll interval (seconds)"),
+}
+
 func main() {
+	flag.Parse()
+
 	storage := memstorage.New()
 	collector := metricscollector.New(storage)
 	collectionServiceClient := garbagecollector.New("http://localhost:8080")
 
-	metricsAgent := agent.New(collector, collectionServiceClient, time.Second*2, time.Second*10)
+	metricsAgent := agent.New(
+		collector,
+		collectionServiceClient,
+		time.Second*(*args.pollInterval),
+		time.Second*(*args.reportInterval),
+	)
 
 	err := metricsAgent.RunPollChron()
 	if err != nil {
@@ -30,7 +50,7 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	err = http.ListenAndServe(`:8081`, mux)
+	err = http.ListenAndServe(*args.endpoint, mux)
 	if err != nil {
 		panic(err)
 	}

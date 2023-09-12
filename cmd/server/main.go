@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"github.com/chikiryau3/garbage-collector/internal/memStorage"
 	"github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	service2 "github.com/chikiryau3/garbage-collector/internal/service"
@@ -8,7 +9,17 @@ import (
 	"net/http"
 )
 
+type Args struct {
+	endpoint *string
+}
+
+var args = &Args{
+	endpoint: flag.String("a", "localhost:8080", "service endpoint"),
+}
+
 func main() {
+	flag.Parse()
+
 	storage := memstorage.New()
 	collector := metricscollector.New(storage)
 	service := service2.New(collector)
@@ -45,7 +56,7 @@ func main() {
 
 	router.Get(`/`, service.GetMetricsHTML)
 
-	err := http.ListenAndServe(`:8080`, router)
+	err := http.ListenAndServe(*args.endpoint, router)
 	if err != nil {
 		panic(err)
 	}
