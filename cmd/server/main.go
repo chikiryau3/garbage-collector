@@ -59,7 +59,7 @@ func main() {
 	router.Get(`/`, service.GetMetricsHTML)
 
 	endpointParts := strings.Split(*args.endpoint, `:`)
-	port := endpointParts[len(endpointParts)-1]
+	port := `:` + endpointParts[len(endpointParts)-1]
 
 	err := http.ListenAndServe(port, router)
 	if err != nil {
