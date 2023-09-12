@@ -8,7 +8,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"net/http"
-	"strings"
 )
 
 type Args struct {
@@ -58,10 +57,10 @@ func main() {
 
 	router.Get(`/`, service.GetMetricsHTML)
 
-	endpointParts := strings.Split(*args.endpoint, `:`)
-	port := `:` + endpointParts[len(endpointParts)-1]
+	//endpointParts := strings.Split(*args.endpoint, `:`)
+	//port := `:` + endpointParts[len(endpointParts)-1]
 
-	err := http.ListenAndServe(port, router)
+	err := http.ListenAndServe(*args.endpoint, router)
 	if err != nil {
 		panic(err)
 	}
