@@ -53,14 +53,9 @@ func (s *service) CounterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *service) GetMetric(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	metricName, ok := ctx.Value(`metricName`).(string)
-	if !ok {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
+	metricDataRaw := s.extractMetricData(r.Context())
 
-	val, err := s.collector.GetMetric(metricName)
+	val, err := s.collector.GetMetric(metricDataRaw.name)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
