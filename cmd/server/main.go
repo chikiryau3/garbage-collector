@@ -33,7 +33,7 @@ func main() {
 			})
 		})
 
-		r.Post(`/`, func(w http.ResponseWriter, r *http.Request) {
+		r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 		})
 	})
