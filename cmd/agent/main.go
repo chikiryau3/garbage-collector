@@ -13,9 +13,9 @@ import (
 )
 
 type Args struct {
-	serverEndpoint *string
-	reportInterval *int `env:"REPORT_INTERVAL"`
-	pollInterval   *int `env:"POLL_INTERVAL"`
+	serverEndpoint *string `env:"ADDRESS"`
+	reportInterval *int    `env:"REPORT_INTERVAL"`
+	pollInterval   *int    `env:"POLL_INTERVAL"`
 }
 
 var args = &Args{
