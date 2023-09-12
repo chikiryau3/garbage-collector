@@ -47,8 +47,6 @@ func (s *service) CounterHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *service) GetMetric(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	_, ok := ctx.Value(`metricType`).(string)
-
 	metricName, ok := ctx.Value(`metricName`).(string)
 	if !ok {
 		w.WriteHeader(http.StatusNotFound)

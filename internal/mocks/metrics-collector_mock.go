@@ -62,6 +62,21 @@ func (mr *MetricsCollectorMockMockRecorder) Gauge(name, value interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Gauge", reflect.TypeOf((*MetricsCollectorMock)(nil).Gauge), name, value)
 }
 
+// GetMetric mocks base method.
+func (m *MetricsCollectorMock) GetMetric(name string) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetMetric", name)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetMetric indicates an expected call of GetMetric.
+func (mr *MetricsCollectorMockMockRecorder) GetMetric(name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMetric", reflect.TypeOf((*MetricsCollectorMock)(nil).GetMetric), name)
+}
+
 // ReadStorage mocks base method.
 func (m *MetricsCollectorMock) ReadStorage() (*memstorage.StorageData, error) {
 	m.ctrl.T.Helper()

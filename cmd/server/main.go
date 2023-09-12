@@ -33,7 +33,7 @@ func main() {
 			})
 		})
 
-		r.Post(`/update/`, func(w http.ResponseWriter, r *http.Request) {
+		r.Post(`/`, func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 		})
 	})
