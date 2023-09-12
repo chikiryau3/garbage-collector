@@ -13,14 +13,14 @@ import (
 
 type Args struct {
 	serverEndpoint *string
-	reportInterval *time.Duration
-	pollInterval   *time.Duration
+	reportInterval *int
+	pollInterval   *int
 }
 
 var args = &Args{
 	serverEndpoint: flag.String("a", "localhost:8080", "service endpoint"),
-	reportInterval: flag.Duration("r", time.Duration(10), "report interval (seconds)"),
-	pollInterval:   flag.Duration("p", time.Duration(2), "poll interval (seconds)"),
+	reportInterval: flag.Int("r", 10, "report interval (seconds)"),
+	pollInterval:   flag.Int("p", 2, "poll interval (seconds)"),
 }
 
 func main() {
@@ -33,8 +33,8 @@ func main() {
 	metricsAgent := agent.New(
 		collector,
 		collectionServiceClient,
-		time.Second*(*args.pollInterval),
-		time.Second*(*args.reportInterval),
+		time.Second*time.Duration(*args.pollInterval),
+		time.Second*time.Duration(*args.reportInterval),
 	)
 
 	err := metricsAgent.RunPollChron()
