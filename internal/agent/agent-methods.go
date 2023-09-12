@@ -47,7 +47,7 @@ func (a *agent) pollMetrics() error {
 	}
 
 	//fmt.Printf("runtime %#v", stats)
-	//fmt.Print("collect \n")
+	fmt.Print("collect \n")
 
 	for metricName, metricValueRaw := range stats {
 		metricValue, ok := metricValueRaw.(float64)
@@ -97,7 +97,7 @@ func (a *agent) sendReport() error {
 	if err != nil {
 		return err
 	}
-	//fmt.Print("send \n")
+	fmt.Print("send \n")
 
 	for metricName, metricValueRaw := range *collectedData {
 		parts := strings.Split(metricName, `:`)
@@ -137,7 +137,7 @@ func (a *agent) RunReporter() error {
 		for range ticker.C {
 			err := a.sendReport()
 			if err != nil {
-				//fmt.Print(fmt.Errorf("report error %e", err))
+				fmt.Print(fmt.Errorf("report error %e", err))
 				return
 			}
 		}

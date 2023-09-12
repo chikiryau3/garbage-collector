@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/chikiryau3/garbage-collector/internal/memStorage"
 	"github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	service2 "github.com/chikiryau3/garbage-collector/internal/service"
@@ -58,7 +57,6 @@ func main() {
 
 	router.Get(`/`, service.GetMetricsHTML)
 
-	fmt.Printf("PORT %s", *args.endpoint)
 	err := http.ListenAndServe(*args.endpoint, router)
 	if err != nil {
 		panic(err)
