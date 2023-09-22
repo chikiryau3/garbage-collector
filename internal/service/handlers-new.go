@@ -12,7 +12,7 @@ import (
 
 func (s *service) GaugeHandlerNew(w http.ResponseWriter, r *http.Request) {
 	mdata := MetricData{
-		mtype: chi.URLParam(r, `metricType`),
+		//mtype: chi.URLParam(r, `metricType`),
 		name:  chi.URLParam(r, `metricName`),
 		value: chi.URLParam(r, `metricValue`),
 	}
@@ -35,7 +35,7 @@ func (s *service) GaugeHandlerNew(w http.ResponseWriter, r *http.Request) {
 
 func (s *service) CounterHandlerNew(w http.ResponseWriter, r *http.Request) {
 	mdata := MetricData{
-		mtype: chi.URLParam(r, `metricType`),
+		//mtype: chi.URLParam(r, `metricType`),
 		name:  chi.URLParam(r, `metricName`),
 		value: chi.URLParam(r, `metricValue`),
 	}
