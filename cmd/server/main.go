@@ -51,6 +51,7 @@ func main() {
 	router.Get(`/`, service.GetMetricsHTML)
 
 	err := http.ListenAndServe(config.Endpoint, router)
+
 	if err != nil {
 		panic(err)
 	}
