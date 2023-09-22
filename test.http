@@ -1,0 +1,55 @@
+### counter valid
+POST /update/counter/someMetric2/100 HTTP/1.1
+Host: localhost:8081
+Content-Length: 0
+Content-Type: text/plain
+
+### get counter valid
+GET /value/counter/someMetric HTTP/1.1
+Host: localhost:8080
+Content-Length: 0
+Content-Type: text/plain
+
+### counter invalid (404)
+POST /update/counter/527 HTTP/1.1
+Host: localhost:8080
+Content-Length: 0
+Content-Type: text/plain
+
+### counter invalid (400)
+POST /update/counter/someMetric/string HTTP/1.1
+Host: localhost:8080
+Content-Length: 0
+Content-Type: text/plain
+
+
+### gauge valid
+POST /update/gauge/someMetric/527 HTTP/1.1
+Host: localhost:8080
+Content-Length: 0
+Content-Type: text/plain
+
+### get gauge valid
+POST /value/gauge/someMetric HTTP/1.1
+Host: localhost:8080
+Content-Length: 0
+Content-Type: text/plain
+
+
+### gauge invalid (404)
+POST /update/gauge/527 HTTP/1.1
+Host: localhost:8080
+Content-Length: 0
+Content-Type: text/plain
+
+### gauge invalid (400)
+POST /update/gauge/someMetric/string HTTP/1.1
+Host: localhost:8080
+Content-Length: 0
+Content-Type: text/plain
+
+### invalid (400)
+POST /update/unknown/testCounter/100 HTTP/1.1
+Host: localhost:8080
+Content-Length: 0
+Content-Type: text/plain
