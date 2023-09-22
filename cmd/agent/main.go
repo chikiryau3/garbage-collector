@@ -8,33 +8,77 @@ import (
 	memstorage "github.com/chikiryau3/garbage-collector/internal/memStorage"
 	metricscollector "github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	"net/http"
+	"os"
+	"strconv"
 	"time"
 )
 
-type Args struct {
+type CLIArgs struct {
 	serverEndpoint *string
-	reportInterval *int
-	pollInterval   *int
+	reportInterval *int64
+	pollInterval   *int64
 }
 
-var args = &Args{
-	serverEndpoint: flag.String("a", "localhost:8080", "service endpoint"),
-	reportInterval: flag.Int("r", 10, "report interval (seconds)"),
-	pollInterval:   flag.Int("p", 2, "poll interval (seconds)"),
+type Config struct {
+	serverEndpoint string
+	reportInterval int64
+	pollInterval   int64
+}
+
+func loadConfig() *Config {
+	args := &CLIArgs{
+		serverEndpoint: flag.String("a", "localhost:8080", "service endpoint"),
+		reportInterval: flag.Int64("r", 10, "report interval (seconds)"),
+		pollInterval:   flag.Int64("p", 2, "poll interval (seconds)"),
+	}
+
+	flag.Parse()
+
+	config := &Config{}
+
+	if endpoint, ok := os.LookupEnv(`ADDRESS`); ok {
+		config.serverEndpoint = endpoint
+	} else {
+		config.serverEndpoint = *args.serverEndpoint
+	}
+
+	if pollInterval, ok := os.LookupEnv(`POLL_INTERVAL`); ok {
+		pollIntervalParsed, err := strconv.ParseInt(pollInterval, 10, 8)
+		if err != nil {
+			config.pollInterval = *args.pollInterval
+		} else {
+			config.pollInterval = pollIntervalParsed
+		}
+	} else {
+		config.pollInterval = *args.pollInterval
+	}
+
+	if reportInterval, ok := os.LookupEnv(`REPORT_INTERVAL`); ok {
+		reportIntervalParsed, err := strconv.ParseInt(reportInterval, 10, 8)
+		if err != nil {
+			config.reportInterval = *args.reportInterval
+		} else {
+			config.reportInterval = reportIntervalParsed
+		}
+	} else {
+		config.reportInterval = *args.reportInterval
+	}
+
+	return config
 }
 
 func main() {
-	flag.Parse()
+	config := loadConfig()
 
 	storage := memstorage.New()
 	collector := metricscollector.New(storage)
-	collectionServiceClient := garbagecollector.New(`http://` + *args.serverEndpoint)
+	collectionServiceClient := garbagecollector.New(`http://` + config.serverEndpoint)
 
 	metricsAgent := agent.New(
 		collector,
 		collectionServiceClient,
-		time.Second*time.Duration(*args.pollInterval),
-		time.Second*time.Duration(*args.reportInterval),
+		time.Second*time.Duration(config.pollInterval),
+		time.Second*time.Duration(config.reportInterval),
 	)
 
 	err := metricsAgent.RunPollChron()
