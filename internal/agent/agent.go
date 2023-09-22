@@ -11,23 +11,21 @@ type Agent interface {
 	RunReporter() error
 }
 
+type Config struct {
+	PollInterval   time.Duration
+	ReportInterval time.Duration
+}
+
 type agent struct {
 	collector               metricscollector.MetricsCollector
 	collectionServiceClient garbagecollector.Client
-	pollInterval            time.Duration
-	reportInterval          time.Duration
+	config                  Config
 }
 
-func New(
-	collector metricscollector.MetricsCollector,
-	collectionServiceClient garbagecollector.Client,
-	pollInterval time.Duration,
-	reportInterval time.Duration,
-) Agent {
+func New(c metricscollector.MetricsCollector, sc garbagecollector.Client, config Config) Agent {
 	return &agent{
-		collector:               collector,
-		collectionServiceClient: collectionServiceClient,
-		pollInterval:            pollInterval,
-		reportInterval:          reportInterval,
+		collector:               c,
+		collectionServiceClient: sc,
+		config:                  config,
 	}
 }

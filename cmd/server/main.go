@@ -1,44 +1,17 @@
 package main
 
 import (
-	"flag"
+	"github.com/chikiryau3/garbage-collector/internal/configs"
 	"github.com/chikiryau3/garbage-collector/internal/memStorage"
 	"github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	service2 "github.com/chikiryau3/garbage-collector/internal/service"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"net/http"
-	"os"
 )
 
-type Config struct {
-	endpoint string
-}
-
-type CLIArgs struct {
-	endpoint *string
-}
-
-func loadConfig() *Config {
-	args := &CLIArgs{
-		endpoint: flag.String("a", "localhost:8080", "service endpoint"),
-	}
-
-	flag.Parse()
-
-	if endpoint, ok := os.LookupEnv(`ADDRESS`); ok {
-		return &Config{
-			endpoint: endpoint,
-		}
-	}
-
-	return &Config{
-		endpoint: *args.endpoint,
-	}
-}
-
 func main() {
-	config := loadConfig()
+	config := configs.LoadServiceConfig()
 
 	storage := memstorage.New()
 	collector := metricscollector.New(storage)
@@ -50,6 +23,7 @@ func main() {
 	router.Route(`/update`, func(r chi.Router) {
 		r.Route(`/gauge`, func(r chi.Router) {
 			r.Route(`/{metricName}/{metricValue}`, func(r chi.Router) {
+				// мидлварь не будет работать, если ее зарегать до темплейта {metricName}/{metricValue}
 				r.Use(service.WithMetricData)
 				r.Post(`/`, service.GaugeHandler)
 			})
@@ -75,8 +49,8 @@ func main() {
 	})
 
 	router.Get(`/`, service.GetMetricsHTML)
-	println(config.endpoint)
-	err := http.ListenAndServe(config.endpoint, router)
+
+	err := http.ListenAndServe(config.Endpoint, router)
 	if err != nil {
 		panic(err)
 	}

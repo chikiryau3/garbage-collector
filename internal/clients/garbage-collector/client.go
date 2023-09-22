@@ -5,9 +5,10 @@ import (
 	"net/http"
 )
 
+// Client -- клиент к сервису, контракты ручек, работа с хедерами, вот это все
 type Client interface {
-	Gauge(metricName string, metricValue float64) error
-	Counter(metricName string, metricValue int64) error
+	SendGauge(metricName string, metricValue float64) error
+	SendCounter(metricName string, metricValue int64) error
 }
 
 type client struct {
@@ -20,7 +21,7 @@ func New(serviceURL string) Client {
 	}
 }
 
-func (c *client) Gauge(metricName string, metricValue float64) error {
+func (c *client) SendGauge(metricName string, metricValue float64) error {
 	req, err := http.NewRequest(
 		http.MethodPost,
 		c.serviceURL+`/update/gauge/`+metricName+`/`+fmt.Sprintf("%f", metricValue),
@@ -46,7 +47,7 @@ func (c *client) Gauge(metricName string, metricValue float64) error {
 	return nil
 }
 
-func (c *client) Counter(metricName string, metricValue int64) error {
+func (c *client) SendCounter(metricName string, metricValue int64) error {
 	req, err := http.NewRequest(
 		http.MethodPost,
 		c.serviceURL+`/update/counter/`+metricName+`/`+fmt.Sprintf("%d", metricValue),

@@ -20,7 +20,7 @@ func (s *service) GaugeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = s.collector.Gauge(metricName, metricValue)
+	err = s.collector.SetGauge(metricName, metricValue)
 	if err != nil {
 		//fmt.Printf("COLLECTION ERROR %e \n", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -40,9 +40,8 @@ func (s *service) CounterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = s.collector.Count(metricName, metricValue)
+	err = s.collector.SetCount(metricName, metricValue)
 	if err != nil {
-		//fmt.Printf("COLLECTION ERROR %e \n", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

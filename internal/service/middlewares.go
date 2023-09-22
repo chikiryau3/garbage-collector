@@ -6,6 +6,10 @@ import (
 	"net/http"
 )
 
+// эта штука родилась в попытке разнести разные куски логики по разным местам
+// тут логика работы с урлом (вытаскивание сырых данных), в хендлере обработка
+// ну и пощупать chi хотелось, там в доке на первой странице что-то подобное
+
 func (s *service) WithMetricData(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		mdata := MetricData{

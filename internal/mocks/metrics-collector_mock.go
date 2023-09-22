@@ -34,34 +34,6 @@ func (m *MetricsCollectorMock) EXPECT() *MetricsCollectorMockMockRecorder {
 	return m.recorder
 }
 
-// Count mocks base method.
-func (m *MetricsCollectorMock) Count(name string, value int64) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Count", name, value)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Count indicates an expected call of Count.
-func (mr *MetricsCollectorMockMockRecorder) Count(name, value interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Count", reflect.TypeOf((*MetricsCollectorMock)(nil).Count), name, value)
-}
-
-// Gauge mocks base method.
-func (m *MetricsCollectorMock) Gauge(name string, value float64) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Gauge", name, value)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Gauge indicates an expected call of Gauge.
-func (mr *MetricsCollectorMockMockRecorder) Gauge(name, value interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Gauge", reflect.TypeOf((*MetricsCollectorMock)(nil).Gauge), name, value)
-}
-
 // GetMetric mocks base method.
 func (m *MetricsCollectorMock) GetMetric(name string) (any, error) {
 	m.ctrl.T.Helper()
@@ -90,4 +62,32 @@ func (m *MetricsCollectorMock) ReadStorage() (*memstorage.StorageData, error) {
 func (mr *MetricsCollectorMockMockRecorder) ReadStorage() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadStorage", reflect.TypeOf((*MetricsCollectorMock)(nil).ReadStorage))
+}
+
+// SetCount mocks base method.
+func (m *MetricsCollectorMock) SetCount(name string, value int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetCount", name, value)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetCount indicates an expected call of SetCount.
+func (mr *MetricsCollectorMockMockRecorder) SetCount(name, value interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetCount", reflect.TypeOf((*MetricsCollectorMock)(nil).SetCount), name, value)
+}
+
+// SetGauge mocks base method.
+func (m *MetricsCollectorMock) SetGauge(name string, value float64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetGauge", name, value)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetGauge indicates an expected call of SetGauge.
+func (mr *MetricsCollectorMockMockRecorder) SetGauge(name, value interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetGauge", reflect.TypeOf((*MetricsCollectorMock)(nil).SetGauge), name, value)
 }

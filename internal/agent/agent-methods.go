@@ -43,41 +43,38 @@ func (a *agent) pollMetrics() error {
 
 	stats, err := filterFields(statsRaw)
 	if err != nil {
-		return err
+		return fmt.Errorf("poll error %w", err)
 	}
-
-	//fmt.Printf("runtime %#v", stats)
-	fmt.Print("collect \n")
 
 	for metricName, metricValueRaw := range stats {
 		metricValue, ok := metricValueRaw.(float64)
 		if !ok {
-			return err
+			return fmt.Errorf("poll error %w", err)
 		}
 		// сохраняю метрики с тегами чтобы можно было отправить все в цикле не разбирая каждую отдельно
-		err := a.collector.Gauge(`gauge:`+metricName, metricValue)
+		err := a.collector.SetGauge(`gauge:`+metricName, metricValue)
 		if err != nil {
-			return err
+			return fmt.Errorf("poll error %w", err)
 		}
 	}
 
 	// сохраняю метрики с тегами чтобы можно было отправить все в цикле не разбирая каждую отдельно
-	err = a.collector.Count("count:PollCount", 1)
+	err = a.collector.SetCount("count:PollCount", 1)
 	if err != nil {
-		return err
+		return fmt.Errorf("poll error %w", err)
 	}
 
 	// сохраняю метрики с тегами чтобы можно было отправить все в цикле не разбирая каждую отдельно
-	err = a.collector.Count("count:RandomValue", rand.Int63())
+	err = a.collector.SetCount("count:RandomValue", rand.Int63())
 	if err != nil {
-		return err
+		return fmt.Errorf("poll error %w", err)
 	}
 
 	return nil
 }
 
 func (a *agent) RunPollChron() error {
-	ticker := time.NewTicker(a.pollInterval)
+	ticker := time.NewTicker(a.config.PollInterval)
 
 	go func() {
 		for range ticker.C {
@@ -95,9 +92,8 @@ func (a *agent) RunPollChron() error {
 func (a *agent) sendReport() error {
 	collectedData, err := a.collector.ReadStorage()
 	if err != nil {
-		return err
+		return fmt.Errorf("send metrics error %w", err)
 	}
-	fmt.Print("send \n")
 
 	for metricName, metricValueRaw := range *collectedData {
 		parts := strings.Split(metricName, `:`)
@@ -107,22 +103,23 @@ func (a *agent) sendReport() error {
 		if metricType == `gauge` {
 			metricValue, ok := metricValueRaw.(float64)
 			if !ok {
-				return fmt.Errorf("metric %s has wrong type, value %T", metricName, metricValueRaw)
+				return fmt.Errorf("metric %s has wrong type, value %v", metricName, metricValueRaw)
 			}
-			err := a.collectionServiceClient.Gauge(metricName, metricValue)
+			err := a.collectionServiceClient.SendGauge(metricName, metricValue)
 			if err != nil {
-				return err
+				return fmt.Errorf("send counter error %w", err)
 			}
 		}
 
 		if metricType == `count` {
 			metricValue, ok := metricValueRaw.(int64)
 			if !ok {
-				return fmt.Errorf("metric %s has wrong type, value %T", metricName, metricValueRaw)
+				return fmt.Errorf("metric %s has wrong type, value %v", metricName, metricValueRaw)
 			}
-			err := a.collectionServiceClient.Counter(metricName, metricValue)
+
+			err := a.collectionServiceClient.SendCounter(metricName, metricValue)
 			if err != nil {
-				return err
+				return fmt.Errorf("send counter error %w", err)
 			}
 		}
 	}
@@ -131,13 +128,13 @@ func (a *agent) sendReport() error {
 }
 
 func (a *agent) RunReporter() error {
-	ticker := time.NewTicker(a.reportInterval)
+	ticker := time.NewTicker(a.config.ReportInterval)
 
 	go func() {
 		for range ticker.C {
 			err := a.sendReport()
 			if err != nil {
-				fmt.Print(fmt.Errorf("report error %e", err))
+				fmt.Printf("%e", err)
 				return
 			}
 		}

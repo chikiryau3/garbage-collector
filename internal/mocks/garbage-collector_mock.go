@@ -33,30 +33,30 @@ func (m *GarbageCollectorMock) EXPECT() *GarbageCollectorMockMockRecorder {
 	return m.recorder
 }
 
-// Counter mocks base method.
-func (m *GarbageCollectorMock) Counter(metricName string, metricValue int64) error {
+// SendCounter mocks base method.
+func (m *GarbageCollectorMock) SendCounter(metricName string, metricValue int64) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Counter", metricName, metricValue)
+	ret := m.ctrl.Call(m, "SendCounter", metricName, metricValue)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Counter indicates an expected call of Counter.
-func (mr *GarbageCollectorMockMockRecorder) Counter(metricName, metricValue interface{}) *gomock.Call {
+// SendCounter indicates an expected call of SendCounter.
+func (mr *GarbageCollectorMockMockRecorder) SendCounter(metricName, metricValue interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Counter", reflect.TypeOf((*GarbageCollectorMock)(nil).Counter), metricName, metricValue)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendCounter", reflect.TypeOf((*GarbageCollectorMock)(nil).SendCounter), metricName, metricValue)
 }
 
-// Gauge mocks base method.
-func (m *GarbageCollectorMock) Gauge(metricName string, metricValue float64) error {
+// SendGauge mocks base method.
+func (m *GarbageCollectorMock) SendGauge(metricName string, metricValue float64) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Gauge", metricName, metricValue)
+	ret := m.ctrl.Call(m, "SendGauge", metricName, metricValue)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Gauge indicates an expected call of Gauge.
-func (mr *GarbageCollectorMockMockRecorder) Gauge(metricName, metricValue interface{}) *gomock.Call {
+// SendGauge indicates an expected call of SendGauge.
+func (mr *GarbageCollectorMockMockRecorder) SendGauge(metricName, metricValue interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Gauge", reflect.TypeOf((*GarbageCollectorMock)(nil).Gauge), metricName, metricValue)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendGauge", reflect.TypeOf((*GarbageCollectorMock)(nil).SendGauge), metricName, metricValue)
 }
