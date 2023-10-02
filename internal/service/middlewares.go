@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/go-chi/chi/v5"
 	"net/http"
+	"time"
 )
 
 // эта штука родилась в попытке разнести разные куски логики по разным местам
@@ -22,5 +23,24 @@ func (s *service) WithMetricData(next http.Handler) http.Handler {
 		ctx := context.WithValue(r.Context(), s.metricDataContextKey, mdata)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func (s *service) WithLogging(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
+		uri := r.RequestURI
+		method := r.Method
+
+		next.ServeHTTP(w, r)
+
+		duration := time.Since(start)
+
+		s.log.Infoln(
+			"uri", uri,
+			"method", method,
+			"duration", duration,
+		)
 	})
 }

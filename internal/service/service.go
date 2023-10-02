@@ -2,6 +2,7 @@ package service
 
 import (
 	metricscollector "github.com/chikiryau3/garbage-collector/internal/metricsCollector"
+	"go.uber.org/zap"
 	"net/http"
 )
 
@@ -16,6 +17,7 @@ type Service interface {
 	// middlewares
 
 	WithMetricData(next http.Handler) http.Handler
+	WithLogging(next http.Handler) http.Handler
 }
 
 type MetricData struct {
@@ -28,12 +30,14 @@ type mKey struct{}
 
 type service struct {
 	collector            metricscollector.MetricsCollector
+	log                  zap.SugaredLogger
 	metricDataContextKey struct{}
 }
 
-func New(collector metricscollector.MetricsCollector) Service {
+func New(collector metricscollector.MetricsCollector, log zap.SugaredLogger) Service {
 	return &service{
 		collector:            collector,
+		log:                  log,
 		metricDataContextKey: mKey{},
 	}
 }
