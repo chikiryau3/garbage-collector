@@ -23,15 +23,12 @@ func main() {
 	router.Route(`/update`, func(r chi.Router) {
 		r.Route(`/gauge`, func(r chi.Router) {
 			r.Route(`/{metricName}/{metricValue}`, func(r chi.Router) {
-				// мидлварь не будет работать, если ее зарегать до темплейта {metricName}/{metricValue}
-				r.Use(service.WithMetricData)
 				r.Post(`/`, service.GaugeHandler)
 			})
 		})
 
 		r.Route(`/counter`, func(r chi.Router) {
 			r.Route(`/{metricName}/{metricValue}`, func(r chi.Router) {
-				r.Use(service.WithMetricData)
 				r.Post(`/`, service.CounterHandler)
 			})
 		})
@@ -43,7 +40,6 @@ func main() {
 
 	router.Route(`/value`, func(r chi.Router) {
 		r.Route(`/{metricType}/{metricName}`, func(r chi.Router) {
-			r.Use(service.WithMetricData)
 			r.Get(`/`, service.GetMetric)
 		})
 	})
