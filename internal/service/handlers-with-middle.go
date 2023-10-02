@@ -1,27 +1,20 @@
 package service
 
 import (
+	"context"
 	"fmt"
-	"github.com/go-chi/chi/v5"
 	"net/http"
 )
 
-// хендлеры без мидлвари
+func (s *service) extractMetricData(ctx context.Context) MetricData {
+	mdata := ctx.Value(s.metricDataContextKey)
 
-// очевидный минус такого: реализация хендлера теперь зависит от выбранного фреймворка
-// в первом варианте это было в мидлвари
-
-func extractMetricsData(r *http.Request) MetricData {
-	return MetricData{
-		mtype: chi.URLParam(r, `metricType`),
-		name:  chi.URLParam(r, `metricName`),
-		value: chi.URLParam(r, `metricValue`),
-	}
+	return mdata.(MetricData)
 }
 
-func (s *service) GaugeHandler(w http.ResponseWriter, r *http.Request) {
-	mdata := extractMetricsData(r)
-	metricName, metricValue, err := s.formatGaugeInput(mdata.name, mdata.value)
+func (s *service) GaugeHandlerOld(w http.ResponseWriter, r *http.Request) {
+	metricDataRaw := s.extractMetricData(r.Context())
+	metricName, metricValue, err := s.formatGaugeInput(metricDataRaw.name, metricDataRaw.value)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -29,6 +22,7 @@ func (s *service) GaugeHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = s.collector.SetGauge(metricName, metricValue)
 	if err != nil {
+		//fmt.Printf("COLLECTION ERROR %e \n", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -38,10 +32,9 @@ func (s *service) GaugeHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (s *service) CounterHandler(w http.ResponseWriter, r *http.Request) {
-	mdata := extractMetricsData(r)
-	metricName, metricValue, err := s.formatCounterInput(mdata.name, mdata.value)
-
+func (s *service) CounterHandlerOld(w http.ResponseWriter, r *http.Request) {
+	metricDataRaw := s.extractMetricData(r.Context())
+	metricName, metricValue, err := s.formatCounterInput(metricDataRaw.name, metricDataRaw.value)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -58,10 +51,10 @@ func (s *service) CounterHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (s *service) GetMetric(w http.ResponseWriter, r *http.Request) {
-	mdata := extractMetricsData(r)
+func (s *service) GetMetricOld(w http.ResponseWriter, r *http.Request) {
+	metricDataRaw := s.extractMetricData(r.Context())
 
-	val, err := s.collector.GetMetric(mdata.name)
+	val, err := s.collector.GetMetric(metricDataRaw.name)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -77,7 +70,7 @@ func (s *service) GetMetric(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (s *service) GetMetricsHTML(w http.ResponseWriter, r *http.Request) {
+func (s *service) GetMetricsHTMLOld(w http.ResponseWriter, r *http.Request) {
 	data, err := s.collector.ReadStorage()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

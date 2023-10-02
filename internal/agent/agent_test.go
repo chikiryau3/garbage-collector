@@ -34,9 +34,9 @@ func Test_agent_pollMetrics(t *testing.T) {
 			wantErr: false,
 			expectationsFn: func() {
 				// много gauge из runtime
-				collectorMock.EXPECT().Gauge(gomock.Any(), gomock.Any()).AnyTimes()
+				collectorMock.EXPECT().SetGauge(gomock.Any(), gomock.Any()).AnyTimes()
 				// 2 count
-				collectorMock.EXPECT().Count(gomock.Any(), gomock.Any()).Times(2)
+				collectorMock.EXPECT().SetCount(gomock.Any(), gomock.Any()).Times(2)
 			},
 		},
 	}
@@ -44,8 +44,10 @@ func Test_agent_pollMetrics(t *testing.T) {
 	a := &agent{
 		collector:               collectorMock,
 		collectionServiceClient: collectionServiceClientMock,
-		pollInterval:            pollInterval,
-		reportInterval:          reportInterval,
+		config: Config{
+			pollInterval,
+			reportInterval,
+		},
 	}
 
 	for _, tt := range tests {
@@ -84,8 +86,8 @@ func Test_agent_sendReport(t *testing.T) {
 			wantErr: false,
 			expectationsFn: func() {
 				collectorMock.EXPECT().ReadStorage().Return(storageData, nil).Times(1)
-				collectionServiceClientMock.EXPECT().Gauge(gomock.Any(), gomock.Any()).Times(2)
-				collectionServiceClientMock.EXPECT().Counter(gomock.Any(), gomock.Any()).Times(2)
+				collectionServiceClientMock.EXPECT().SendGauge(gomock.Any(), gomock.Any()).Times(2)
+				collectionServiceClientMock.EXPECT().SendCounter(gomock.Any(), gomock.Any()).Times(2)
 			},
 		},
 	}
@@ -93,8 +95,10 @@ func Test_agent_sendReport(t *testing.T) {
 	a := &agent{
 		collector:               collectorMock,
 		collectionServiceClient: collectionServiceClientMock,
-		pollInterval:            pollInterval,
-		reportInterval:          reportInterval,
+		config: Config{
+			pollInterval,
+			reportInterval,
+		},
 	}
 
 	for _, tt := range tests {

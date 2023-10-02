@@ -35,7 +35,6 @@ Host: localhost:8080
 Content-Length: 0
 Content-Type: text/plain
 
-
 ### gauge invalid (404)
 POST /update/gauge/527 HTTP/1.1
 Host: localhost:8080
