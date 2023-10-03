@@ -122,6 +122,8 @@ func (a *agent) sendReport() error {
 				return fmt.Errorf("send counter error %w", err)
 			}
 		}
+
+		time.Sleep(100)
 	}
 
 	return nil
