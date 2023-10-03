@@ -66,3 +66,9 @@ Host: localhost:8080
 Content-Type: application/json
 
 {"id": "PollCount", "type": "counter", "delta": null}
+
+###
+GET /
+Host: localhost:8080
+Accept: text/html
+Accept-Encoding: gzip

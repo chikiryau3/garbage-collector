@@ -137,13 +137,14 @@ func (s *service) GetMetricsHTML(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "text/html")
+
 	_, err = w.Write([]byte(fmt.Sprintf("%v", data)))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Add("Content-type", "text/html")
 	w.WriteHeader(http.StatusOK)
 }
 
