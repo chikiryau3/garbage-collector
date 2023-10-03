@@ -45,7 +45,7 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 	//	return err
 	//}
 
-	fmt.Printf("SendGauge body %s\n", body)
+	fmt.Printf("SendGauge body %s ", body)
 
 	req, err := http.NewRequest(
 		http.MethodPost,

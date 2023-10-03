@@ -58,7 +58,7 @@ POST /value/
 Host: localhost:8080
 Content-Type: application/json
 
-{"id": "buckHashSys", "type": "gauge", "value": null}
+{"id": "alloc", "type": "gauge", "value": null}
 
 ###
 POST /value/
