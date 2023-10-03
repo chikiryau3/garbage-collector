@@ -65,4 +65,4 @@ POST /value/
 Host: localhost:8080
 Content-Type: application/json
 
-{"id": "pollCount", "type": "counter", "delta": null}
+{"id": "PollCount", "type": "counter", "delta": null}
