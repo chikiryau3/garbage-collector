@@ -58,4 +58,11 @@ POST /value/
 Host: localhost:8080
 Content-Type: application/json
 
-{"id": "heapReleased", "type": "gauge", "value": null}
+{"id": "buckHashSys", "type": "gauge", "value": null}
+
+###
+POST /value/
+Host: localhost:8080
+Content-Type: application/json
+
+{"id": "PollCount", "type": "counter", "delta": null}

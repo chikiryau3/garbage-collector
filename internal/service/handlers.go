@@ -23,12 +23,13 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//s.log.Debug("VAL: mdata", mdata)
+	s.log.Debug("VAL: mdata", mdata)
 	//s.log.Debug("VAL: value", mdata.Value, *mdata.Value)
 	//s.log.Debug("VAL: delta", mdata.Delta, *mdata.Delta)
 
 	if mdata.MType == `gauge` {
 		value, err := s.collector.GetMetric(mdata.ID)
+		s.log.Debug("VAL: mdata gauge", value)
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
 			return
@@ -51,14 +52,14 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
 	_, err = w.Write(resp)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	w.Header().Set("Content-type", "application/json")
-	w.WriteHeader(http.StatusOK)
 }
 
 func (s *service) UpdateHandler(w http.ResponseWriter, r *http.Request) {
@@ -76,14 +77,19 @@ func (s *service) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//s.log.Debug("UPD: mdata", mdata)
+	s.log.Debug("UPD: mdata", mdata)
 	//s.log.Debug("UPD: value", mdata.Value, *mdata.Value)
 	//s.log.Debug("UPD: delta", mdata.Delta, *mdata.Delta)
 
 	if mdata.MType == `gauge` {
-		//s.log.Debug("UPD GAUGE:", mdata.ID, *mdata.Value)
+		s.log.Debug("UPD GAUGE:", mdata.ID, mdata.Value)
 		//metricName, metricValue, err := s.formatGaugeInput(mdata.ID, *mdata.Value)
 		//s.log.Debug("UPD GAUGE:", mdata.ID, *mdata.Value)
+
+		//if mdata.Value == nil {
+		//	w.WriteHeader(http.StatusBadRequest)
+		//	return
+		//}
 
 		value, err := s.collector.SetGauge(mdata.ID, *mdata.Value)
 		if err != nil {
@@ -91,15 +97,20 @@ func (s *service) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		mdata.Value = value
+		mdata.Value = &value
 	} else if mdata.MType == `counter` {
+		//if mdata.Delta == nil {
+		//	w.WriteHeader(http.StatusBadRequest)
+		//	return
+		//}
+
 		delta, err := s.collector.SetCount(mdata.ID, *mdata.Delta)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		mdata.Delta = delta
+		mdata.Delta = &delta
 	}
 
 	resp, err := json.Marshal(mdata)
@@ -108,14 +119,14 @@ func (s *service) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
 	_, err = w.Write(resp)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	w.Header().Set("Content-type", "application/json")
-	w.WriteHeader(http.StatusOK)
 }
 
 func (s *service) GetMetricsHTML(w http.ResponseWriter, r *http.Request) {

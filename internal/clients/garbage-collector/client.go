@@ -63,7 +63,7 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 func (c *client) SendCounter(metricName string, metricValue int64) error {
 	var mData service.Metrics
 	mData.ID = metricName
-	mData.MType = `gauge`
+	mData.MType = `counter`
 	mData.Delta = &metricValue
 
 	body, err := json.Marshal(mData)
@@ -71,9 +71,12 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 		return err
 	}
 
+	fmt.Printf("SendCounter %#v", mData)
+	fmt.Printf("SendCounter body %s", body)
+
 	req, err := http.NewRequest(
 		http.MethodPost,
-		c.serviceURL+`/update/counter/`+metricName+`/`+fmt.Sprintf("%d", metricValue),
+		c.serviceURL+`/update/`,
 		bytes.NewBuffer(body),
 	)
 	if err != nil {

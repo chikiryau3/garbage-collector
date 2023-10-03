@@ -5,25 +5,25 @@ import (
 	memstorage "github.com/chikiryau3/garbage-collector/internal/memStorage"
 )
 
-func (c *metricsCollector) SetGauge(name string, value float64) (*float64, error) {
+func (c *metricsCollector) SetGauge(name string, value float64) (float64, error) {
 	err := c.storage.WriteMetric(name, value)
 	if err != nil {
-		return nil, fmt.Errorf("cannot write gauge metric %w", err)
+		return 0, fmt.Errorf("cannot write gauge metric %w", err)
 	}
 
-	return &value, nil
+	return value, nil
 }
 
-func (c *metricsCollector) SetCount(name string, value int64) (*int64, error) {
+func (c *metricsCollector) SetCount(name string, value int64) (int64, error) {
 	currentValueRaw, ok := c.storage.ReadMetric(name)
 	// если метрика еще не представлена в storage, то пишем переданное значение
 	if !ok {
 		err := c.storage.WriteMetric(name, value)
 		if err != nil {
-			return nil, fmt.Errorf("cannot write count metric %w", err)
+			return 0, fmt.Errorf("cannot write count metric %w", err)
 		}
 
-		return &value, nil
+		return value, nil
 	}
 
 	// если значение метрики в storage неправильное, то подменяем на переданное
@@ -33,19 +33,19 @@ func (c *metricsCollector) SetCount(name string, value int64) (*int64, error) {
 	if !ok {
 		err := c.storage.WriteMetric(name, value)
 		if err != nil {
-			return nil, fmt.Errorf("cannot write count metric %w", err)
+			return 0, fmt.Errorf("cannot write count metric %w", err)
 		}
 
-		return &value, nil
+		return value, nil
 	}
 
 	newValue := value + currentValue
 	err := c.storage.WriteMetric(name, newValue)
 	if err != nil {
-		return nil, fmt.Errorf("cannot write count metric %w", err)
+		return 0, fmt.Errorf("cannot write count metric %w", err)
 	}
 
-	return &newValue, nil
+	return newValue, nil
 }
 
 func (c *metricsCollector) ReadStorage() (*memstorage.StorageData, error) {
