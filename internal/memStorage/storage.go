@@ -1,5 +1,7 @@
 package memstorage
 
+import "sync"
+
 type StorageData map[string]any
 
 // MemStorage -- интерфейс для работы с хранилищем, "читать и писать"
@@ -14,21 +16,29 @@ type MemStorage interface {
 
 type storage struct {
 	data StorageData
+	sync.Mutex
 }
 
 func (s *storage) WriteMetric(name string, value any) error {
+	s.Lock()
+	defer s.Unlock()
 	s.data[name] = value
 
 	return nil
 }
 
 func (s *storage) ReadMetric(name string) (any, bool) {
+	s.Lock()
+	defer s.Unlock()
 	value, ok := s.data[name]
 
 	return value, ok
 }
 
 func (s *storage) GetData() (*StorageData, error) {
+	s.Lock()
+	defer s.Unlock()
+
 	return &s.data, nil
 }
 
