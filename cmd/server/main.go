@@ -49,7 +49,7 @@ func main() {
 	})
 
 	router.Route(`/value`, func(r chi.Router) {
-		router.Post(`/`, service.ValueHandler)
+		r.Post(`/`, service.ValueHandler)
 		r.Route(`/{metricType}/{metricName}`, func(r chi.Router) {
 			r.Get(`/`, service.GetMetric)
 		})

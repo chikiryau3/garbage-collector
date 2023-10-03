@@ -52,3 +52,10 @@ POST /update/unknown/testCounter/100 HTTP/1.1
 Host: localhost:8080
 Content-Length: 0
 Content-Type: text/plain
+
+###
+POST /value/
+Host: localhost:8080
+Content-Type: application/json
+
+{"id": "heapReleased", "type": "gauge", "value": null}

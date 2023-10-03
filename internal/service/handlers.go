@@ -23,9 +23,9 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.log.Debug("VAL: mdata", mdata)
-	s.log.Debug("VAL: value", mdata.Value, *mdata.Value)
-	s.log.Debug("VAL: delta", mdata.Delta, *mdata.Delta)
+	//s.log.Debug("VAL: mdata", mdata)
+	//s.log.Debug("VAL: value", mdata.Value, *mdata.Value)
+	//s.log.Debug("VAL: delta", mdata.Delta, *mdata.Delta)
 
 	if mdata.MType == `gauge` {
 		value, err := s.collector.GetMetric(mdata.ID)
