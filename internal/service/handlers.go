@@ -17,7 +17,7 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var mdata Metrics
+	var mdata MetricsRes
 	if err = json.Unmarshal(buf.Bytes(), &mdata); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -34,8 +34,7 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		s.log.Debug("VAL: gauge ", mdata.ID, " value:", value)
-		newValue := float64(value.(int64))
-		mdata.Value = &newValue
+		mdata.Value = value
 		//s.log.Debug("VAL: gauge ", mdata.ID, " value:", mdata.Value)
 	} else if mdata.MType == `counter` {
 		value, err := s.collector.GetMetric(mdata.ID)
@@ -43,8 +42,7 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
-		delta := value.(int64)
-		mdata.Delta = &delta
+		mdata.Delta = value
 		s.log.Debug("VAL: counter ", mdata.ID, " delta:", mdata.Delta)
 	}
 
