@@ -33,9 +33,10 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
+		s.log.Debug("VAL: gauge ", mdata.ID, " value:", value)
 		newValue := float64(value.(int64))
 		mdata.Value = &newValue
-		s.log.Debug("VAL: gauge ", mdata.ID, " value:", mdata.Value)
+		//s.log.Debug("VAL: gauge ", mdata.ID, " value:", mdata.Value)
 	} else if mdata.MType == `counter` {
 		value, err := s.collector.GetMetric(mdata.ID)
 		if err != nil {
