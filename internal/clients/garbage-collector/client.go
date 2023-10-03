@@ -1,7 +1,10 @@
 package garbagecollector
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"github.com/chikiryau3/garbage-collector/internal/service"
 	"net/http"
 )
 
@@ -22,16 +25,26 @@ func New(serviceURL string) Client {
 }
 
 func (c *client) SendGauge(metricName string, metricValue float64) error {
+	var mData service.Metrics
+	mData.ID = metricName
+	mData.MType = `gauge`
+	mData.Value = &metricValue
+
+	body, err := json.Marshal(mData)
+	if err != nil {
+		return err
+	}
+
 	req, err := http.NewRequest(
 		http.MethodPost,
-		c.serviceURL+`/update/gauge/`+metricName+`/`+fmt.Sprintf("%f", metricValue),
-		nil,
+		c.serviceURL+`/update/`,
+		bytes.NewBuffer(body),
 	)
 	if err != nil {
 		return err
 	}
 
-	req.Header.Add("Content-type", "text/plain")
+	req.Header.Add("Content-type", "application/json")
 
 	// пока тело ответа нам не нужно
 	res, err := http.DefaultClient.Do(req)
@@ -48,16 +61,26 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 }
 
 func (c *client) SendCounter(metricName string, metricValue int64) error {
+	var mData service.Metrics
+	mData.ID = metricName
+	mData.MType = `gauge`
+	mData.Delta = &metricValue
+
+	body, err := json.Marshal(mData)
+	if err != nil {
+		return err
+	}
+
 	req, err := http.NewRequest(
 		http.MethodPost,
 		c.serviceURL+`/update/counter/`+metricName+`/`+fmt.Sprintf("%d", metricValue),
-		nil,
+		bytes.NewBuffer(body),
 	)
 	if err != nil {
 		return err
 	}
 
-	req.Header.Add("Content-type", "text/plain")
+	req.Header.Add("Content-type", "application/json")
 
 	// пока тело ответа нам не нужно
 	res, err := http.DefaultClient.Do(req)

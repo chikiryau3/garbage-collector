@@ -52,20 +52,20 @@ func (a *agent) pollMetrics() error {
 			return fmt.Errorf("poll error %w", err)
 		}
 		// сохраняю метрики с тегами чтобы можно было отправить все в цикле не разбирая каждую отдельно
-		err := a.collector.SetGauge(`gauge:`+metricName, metricValue)
+		_, err := a.collector.SetGauge(`gauge:`+metricName, metricValue)
 		if err != nil {
 			return fmt.Errorf("poll error %w", err)
 		}
 	}
 
 	// сохраняю метрики с тегами чтобы можно было отправить все в цикле не разбирая каждую отдельно
-	err = a.collector.SetCount("count:PollCount", 1)
+	_, err = a.collector.SetCount("count:PollCount", 1)
 	if err != nil {
 		return fmt.Errorf("poll error %w", err)
 	}
 
 	// сохраняю метрики с тегами чтобы можно было отправить все в цикле не разбирая каждую отдельно
-	err = a.collector.SetCount("count:RandomValue", rand.Int63())
+	_, err = a.collector.SetCount("count:RandomValue", rand.Int63())
 	if err != nil {
 		return fmt.Errorf("poll error %w", err)
 	}

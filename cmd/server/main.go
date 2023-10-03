@@ -29,29 +29,9 @@ func main() {
 	//router.Use(middleware.Logger)
 	router.Use(service.WithLogging)
 
-	router.Route(`/update`, func(r chi.Router) {
-		r.Route(`/gauge`, func(r chi.Router) {
-			r.Route(`/{metricName}/{metricValue}`, func(r chi.Router) {
-				r.Post(`/`, service.GaugeHandler)
-			})
-		})
+	router.Post(`/update`, service.UpdateHandler)
 
-		r.Route(`/counter`, func(r chi.Router) {
-			r.Route(`/{metricName}/{metricValue}`, func(r chi.Router) {
-				r.Post(`/`, service.CounterHandler)
-			})
-		})
-
-		r.Post(`/*`, func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusBadRequest)
-		})
-	})
-
-	router.Route(`/value`, func(r chi.Router) {
-		r.Route(`/{metricType}/{metricName}`, func(r chi.Router) {
-			r.Get(`/`, service.GetMetric)
-		})
-	})
+	router.Post(`/value`, service.ValueHandler)
 
 	router.Get(`/`, service.GetMetricsHTML)
 
