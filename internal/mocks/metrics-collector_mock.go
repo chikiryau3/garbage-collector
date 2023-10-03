@@ -65,10 +65,10 @@ func (mr *MetricsCollectorMockMockRecorder) ReadStorage() *gomock.Call {
 }
 
 // SetCount mocks base method.
-func (m *MetricsCollectorMock) SetCount(name string, value int64) (*int64, error) {
+func (m *MetricsCollectorMock) SetCount(name string, value int64) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetCount", name, value)
-	ret0, _ := ret[0].(*int64)
+	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -80,10 +80,10 @@ func (mr *MetricsCollectorMockMockRecorder) SetCount(name, value interface{}) *g
 }
 
 // SetGauge mocks base method.
-func (m *MetricsCollectorMock) SetGauge(name string, value float64) (*float64, error) {
+func (m *MetricsCollectorMock) SetGauge(name string, value float64) (float64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetGauge", name, value)
-	ret0, _ := ret[0].(*float64)
+	ret0, _ := ret[0].(float64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
