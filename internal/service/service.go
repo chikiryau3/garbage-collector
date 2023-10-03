@@ -7,15 +7,27 @@ import (
 )
 
 type Service interface {
-	// handlers
+	// handlers json
 
 	UpdateHandler(w http.ResponseWriter, r *http.Request)
 	ValueHandler(w http.ResponseWriter, r *http.Request)
+
+	// handlers plain
+
+	GaugeHandler(w http.ResponseWriter, r *http.Request)
+	CounterHandler(w http.ResponseWriter, r *http.Request)
+	GetMetric(w http.ResponseWriter, r *http.Request)
 	GetMetricsHTML(w http.ResponseWriter, r *http.Request)
 
 	// middlewares
 
 	WithLogging(next http.Handler) http.Handler
+}
+
+type MetricData struct {
+	mtype string
+	name  string
+	value any
 }
 
 type service struct {
