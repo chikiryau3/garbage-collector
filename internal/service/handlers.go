@@ -44,7 +44,7 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		delta := value.(int64)
 		mdata.Delta = &delta
-		s.log.Debug("VAL: counter ", " delta:", mdata.Delta)
+		s.log.Debug("VAL: counter ", mdata.ID, " delta:", mdata.Delta)
 	}
 
 	resp, err := json.Marshal(mdata)

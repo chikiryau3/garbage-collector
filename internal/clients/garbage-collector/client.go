@@ -52,7 +52,7 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 		bytes.NewBuffer(body),
 		//&buf,
 	)
-	req.Close = true
+	//req.Close = true
 	if err != nil {
 		return fmt.Errorf("request build err %w", err)
 	}
@@ -96,7 +96,7 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 	if err != nil {
 		return fmt.Errorf("request build err %w", err)
 	}
-	req.Close = true
+	//req.Close = true
 
 	req.Header.Add("Content-type", "application/json")
 
