@@ -143,7 +143,7 @@ func (s *service) GetMetricsHTML(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-type", "text/html")
+	w.Header().Add("Content-type", "text/html")
 	w.WriteHeader(http.StatusOK)
 }
 
