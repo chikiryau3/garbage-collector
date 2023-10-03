@@ -35,6 +35,8 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 		return err
 	}
 
+	fmt.Printf("SendGauge body %s\n", body)
+
 	req, err := http.NewRequest(
 		http.MethodPost,
 		c.serviceURL+`/update/`,
@@ -71,8 +73,8 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 		return err
 	}
 
-	fmt.Printf("SendCounter %#v", mData)
-	fmt.Printf("SendCounter body %s", body)
+	//fmt.Printf("SendCounter %#v", mData)
+	fmt.Printf("SendCounter body %s\n", body)
 
 	req, err := http.NewRequest(
 		http.MethodPost,

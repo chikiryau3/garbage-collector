@@ -77,12 +77,12 @@ func (s *service) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.log.Debug("UPD: mdata", mdata)
+	//s.log.Debug("UPD: mdata", mdata)
 	//s.log.Debug("UPD: value", mdata.Value, *mdata.Value)
 	//s.log.Debug("UPD: delta", mdata.Delta, *mdata.Delta)
 
 	if mdata.MType == `gauge` {
-		s.log.Debug("UPD GAUGE:", mdata.ID, mdata.Value)
+		s.log.Debug("UPD GAUGE:", mdata.ID, *mdata.Value)
 		//metricName, metricValue, err := s.formatGaugeInput(mdata.ID, *mdata.Value)
 		//s.log.Debug("UPD GAUGE:", mdata.ID, *mdata.Value)
 
@@ -99,6 +99,7 @@ func (s *service) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 		mdata.Value = &value
 	} else if mdata.MType == `counter` {
+		s.log.Debug("UPD COUNTER:", mdata.ID, *mdata.Delta)
 		//if mdata.Delta == nil {
 		//	w.WriteHeader(http.StatusBadRequest)
 		//	return
