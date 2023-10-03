@@ -1,5 +1,8 @@
 package agent
 
+// то, что в json все ключи с большой буквы нужны -- это шутка какая-то?
+// 3 часа времени убил чтобы догадаться до этого
+
 type RuntimeMetrics struct {
 	Alloc         uint64  `json:"Alloc"`
 	BuckHashSys   uint64  `json:"BuckHashSys"`

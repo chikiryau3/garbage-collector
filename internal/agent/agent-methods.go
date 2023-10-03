@@ -14,7 +14,6 @@ import (
 func filterFields(data interface{}) (map[string]any, error) {
 	var stats RuntimeMetrics
 	statsJSON, err := json.Marshal(data)
-	//fmt.Printf("------------------- \n 1 %s ------------------- \n ------------------- \n", statsJSON)
 	if err != nil {
 		return nil, err
 	}
@@ -29,13 +28,12 @@ func filterFields(data interface{}) (map[string]any, error) {
 	if err != nil {
 		return nil, err
 	}
-	//fmt.Printf("-------------------  2 %s -------------------  \n ------------------- \n", statsJSON)
 
 	err = json.Unmarshal(statsJSON, &filteredMap)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf(" ------------------- \n filteredMap %#v ------------------- \n", filteredMap)
+
 	return filteredMap, nil
 }
 

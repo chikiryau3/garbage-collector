@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/chikiryau3/garbage-collector/internal/service"
-	"io"
 	"net/http"
 )
 
@@ -45,7 +44,7 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 	//	return err
 	//}
 
-	fmt.Printf("SendGauge body %s ", body)
+	//fmt.Printf("SendGauge body %s ", body)
 
 	req, err := http.NewRequest(
 		http.MethodPost,
@@ -68,13 +67,13 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 		return nil
 	}
 
-	bodyBytes, err := io.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println(fmt.Errorf("body read err %w", err))
-		return nil
-	}
-	bodyString := string(bodyBytes)
-	fmt.Printf("SEND GAUGE res %s\n", bodyString)
+	//bodyBytes, err := io.ReadAll(res.Body)
+	//if err != nil {
+	//	fmt.Println(fmt.Errorf("body read err %w", err))
+	//	return nil
+	//}
+	//bodyString := string(bodyBytes)
+	//fmt.Printf("SEND GAUGE res %s\n", bodyString)
 
 	err = res.Body.Close()
 	if err != nil {
@@ -96,7 +95,7 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 	}
 
 	//fmt.Printf("SendCounter %#v", mData)
-	fmt.Printf("SendCounter body %s\n", body)
+	//fmt.Printf("SendCounter body %s\n", body)
 
 	req, err := http.NewRequest(
 		http.MethodPost,
@@ -117,13 +116,13 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 		return nil
 	}
 
-	bodyBytes, err := io.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println(fmt.Errorf("body read err %w", err))
-		return nil
-	}
-	bodyString := string(bodyBytes)
-	fmt.Printf("SEND COUNTRE res %s\n", bodyString)
+	//bodyBytes, err := io.ReadAll(res.Body)
+	//if err != nil {
+	//	fmt.Println(fmt.Errorf("body read err %w", err))
+	//	return nil
+	//}
+	//bodyString := string(bodyBytes)
+	//fmt.Printf("SEND COUNTRE res %s\n", bodyString)
 
 	err = res.Body.Close()
 	if err != nil {
