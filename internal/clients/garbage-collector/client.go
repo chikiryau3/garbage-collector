@@ -43,20 +43,21 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 		bytes.NewBuffer(body),
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("request build err %w", err)
 	}
 
 	req.Header.Add("Content-type", "application/json")
+	//req.Header.Add("Content-encoding", "gzip")
 
 	// пока тело ответа нам не нужно
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return err
+		return fmt.Errorf("do request err %w", err)
 	}
 
 	err = res.Body.Close()
 	if err != nil {
-		return err
+		return fmt.Errorf("body close err %w", err)
 	}
 
 	return nil
@@ -70,7 +71,7 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 
 	body, err := json.Marshal(mData)
 	if err != nil {
-		return err
+		return fmt.Errorf(" %w", err)
 	}
 
 	//fmt.Printf("SendCounter %#v", mData)
@@ -82,7 +83,7 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 		bytes.NewBuffer(body),
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("request build err %w", err)
 	}
 
 	req.Header.Add("Content-type", "application/json")
@@ -90,12 +91,12 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 	// пока тело ответа нам не нужно
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return err
+		return fmt.Errorf("do request err %w", err)
 	}
 
 	err = res.Body.Close()
 	if err != nil {
-		return err
+		return fmt.Errorf("body close err %w", err)
 	}
 
 	return nil

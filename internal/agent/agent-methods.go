@@ -107,7 +107,7 @@ func (a *agent) sendReport() error {
 			}
 			err := a.collectionServiceClient.SendGauge(metricName, metricValue)
 			if err != nil {
-				return fmt.Errorf("send counter error %w", err)
+				return fmt.Errorf("send gauge error %w", err)
 			}
 		}
 
