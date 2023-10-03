@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/chikiryau3/garbage-collector/internal/service"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -64,16 +63,18 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 
 	// пока тело ответа нам не нужно
 	res, err := http.DefaultClient.Do(req)
-	bodyBytes, err := io.ReadAll(res.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	bodyString := string(bodyBytes)
-	fmt.Printf("SEND GAUGE res %s\n", bodyString)
 	if err != nil {
 		fmt.Println(fmt.Errorf("do request err %w", err))
 		return nil
 	}
+
+	bodyBytes, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(fmt.Errorf("body read err %w", err))
+		return nil
+	}
+	bodyString := string(bodyBytes)
+	fmt.Printf("SEND GAUGE res %s\n", bodyString)
 
 	err = res.Body.Close()
 	if err != nil {
@@ -111,16 +112,18 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 
 	// пока тело ответа нам не нужно
 	res, err := http.DefaultClient.Do(req)
-	bodyBytes, err := io.ReadAll(res.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	bodyString := string(bodyBytes)
-	fmt.Printf("SEND COUNTRE res %s\n", bodyString)
 	if err != nil {
 		fmt.Println(fmt.Errorf("do request err %w", err))
 		return nil
 	}
+
+	bodyBytes, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(fmt.Errorf("body read err %w", err))
+		return nil
+	}
+	bodyString := string(bodyBytes)
+	fmt.Printf("SEND COUNTRE res %s\n", bodyString)
 
 	err = res.Body.Close()
 	if err != nil {
