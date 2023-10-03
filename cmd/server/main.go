@@ -27,7 +27,8 @@ func main() {
 
 	router := chi.NewRouter()
 	//router.Use(middleware.Logger)
-	//router.Use(service.WithLogging)
+	router.Use(service.WithLogging)
+	router.Use(service2.GzipMiddleware)
 
 	router.Route(`/update`, func(r chi.Router) {
 		r.Post(`/`, service.UpdateHandler)

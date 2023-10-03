@@ -2,6 +2,7 @@ package garbagecollector
 
 import (
 	"bytes"
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"github.com/chikiryau3/garbage-collector/internal/service"
@@ -35,22 +36,22 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 		return err
 	}
 
-	//var buf bytes.Buffer
-	//g := gzip.NewWriter(&buf)
-	//if _, err = g.Write(body); err != nil {
-	//	return err
-	//}
-	//if err = g.Close(); err != nil {
-	//	return err
-	//}
+	var buf bytes.Buffer
+	g := gzip.NewWriter(&buf)
+	if _, err = g.Write(body); err != nil {
+		return err
+	}
+	if err = g.Close(); err != nil {
+		return err
+	}
 
 	//fmt.Printf("SendGauge body %s ", body)
 
 	req, err := http.NewRequest(
 		http.MethodPost,
 		c.serviceURL+`/update/`,
-		bytes.NewBuffer(body),
-		//&buf,
+		//bytes.NewBuffer(body),
+		&buf,
 	)
 	//req.Close = true
 	if err != nil {
@@ -58,7 +59,8 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 	}
 
 	req.Header.Add("Content-type", "application/json")
-	//req.Header.Add("Content-encoding", "gzip")
+	req.Header.Add("Content-encoding", "gzip")
+	req.Header.Add("Accept-encoding", "gzip")
 
 	// пока тело ответа нам не нужно
 	res, err := http.DefaultClient.Do(req)
@@ -97,10 +99,19 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 	//fmt.Printf("SendCounter %#v", mData)
 	//fmt.Printf("SendCounter body %s\n", body)
 
+	var buf bytes.Buffer
+	g := gzip.NewWriter(&buf)
+	if _, err = g.Write(body); err != nil {
+		return err
+	}
+	if err = g.Close(); err != nil {
+		return err
+	}
 	req, err := http.NewRequest(
 		http.MethodPost,
 		c.serviceURL+`/update/`,
-		bytes.NewBuffer(body),
+		//bytes.NewBuffer(body),
+		&buf,
 	)
 	if err != nil {
 		return fmt.Errorf("request build err %w", err)
@@ -108,6 +119,8 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 	//req.Close = true
 
 	req.Header.Add("Content-type", "application/json")
+	req.Header.Add("Content-encoding", "gzip")
+	req.Header.Add("Accept-encoding", "gzip")
 
 	// пока тело ответа нам не нужно
 	res, err := http.DefaultClient.Do(req)
