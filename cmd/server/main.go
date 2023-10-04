@@ -28,6 +28,8 @@ func main() {
 		SyncStore:       config.StoreInterval == 0,
 	})
 
+	log.Info(config)
+
 	if config.Restore {
 		err = storage.RestoreFromDump()
 		log.Error(err)

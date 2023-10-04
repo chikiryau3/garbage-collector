@@ -37,7 +37,9 @@ type storage struct {
 func appendDataToFile(path string, data []byte) error {
 	flags := os.O_WRONLY | os.O_CREATE | os.O_APPEND
 	file, err := os.OpenFile(path, flags, 0666)
-	defer file.Close()
+	defer func() {
+		err = file.Close()
+	}()
 
 	if err != nil {
 		return err
