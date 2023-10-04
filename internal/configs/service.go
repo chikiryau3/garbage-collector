@@ -2,7 +2,6 @@ package configs
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"strconv"
 )
@@ -31,8 +30,6 @@ func LoadServiceConfig() *ServiceConfig {
 
 	flag.Parse()
 
-	fmt.Printf("ARGS %#v \n", args)
-
 	config := &ServiceConfig{}
 
 	if endpoint, ok := os.LookupEnv(`ADDRESS`); ok {
@@ -50,9 +47,7 @@ func LoadServiceConfig() *ServiceConfig {
 		}
 	} else {
 		config.StoreInterval = *args.storeInterval
-		fmt.Printf("STORE INTERVAL FROM ARGS %d", *args.storeInterval)
 	}
-	fmt.Printf("CONFIG STORE INTERVAL%#v", config.StoreInterval)
 
 	if fileStoragePath, ok := os.LookupEnv(`FILE_STORAGE_PATH`); ok {
 		config.FileStoragePath = fileStoragePath

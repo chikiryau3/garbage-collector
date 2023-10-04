@@ -23,6 +23,8 @@ func (s *storage) dumpStorage() error {
 	}
 
 	j, err := json.Marshal(data)
+	fmt.Printf("JSON DUMP %s \n", j)
+
 	if err != nil {
 		return fmt.Errorf("dump storage error %w", err)
 	}
@@ -43,7 +45,7 @@ func (s *storage) RunStorageDumper() error {
 		for range ticker.C {
 			err := s.dumpStorage()
 			if err != nil {
-				//fmt.Errorf("dump storage error %w", err)
+				fmt.Print(fmt.Errorf("dumper error %e", err))
 				return
 			}
 		}
