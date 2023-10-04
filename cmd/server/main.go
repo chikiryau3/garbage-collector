@@ -35,10 +35,10 @@ func main() {
 	//	log.Error(err)
 	//}
 
-	if config.FileStoragePath != "" {
-		err = storage.RunStorageDumper()
-		log.Error(err)
-	}
+	//if config.FileStoragePath != "" {
+	//	err = storage.RunStorageDumper()
+	//	log.Error(err)
+	//}
 
 	collector := metricscollector.New(storage)
 	service := service2.New(collector, log)
