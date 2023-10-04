@@ -8,6 +8,8 @@ import (
 )
 
 func (s *storage) dumpStorage() error {
+	s.Lock()
+	defer s.Unlock()
 	data, err := s.GetData()
 	if err != nil {
 		return fmt.Errorf("dump storage error %w", err)
@@ -56,6 +58,8 @@ func (s *storage) RunStorageDumper() <-chan error {
 }
 
 func (s *storage) RestoreFromDump() error {
+	s.Lock()
+	defer s.Unlock()
 	fmt.Print("STORAGE RESTORE START\n")
 
 	var storageData StorageData
