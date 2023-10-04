@@ -16,7 +16,12 @@ import (
 func main() {
 	config := configs.LoadAgentConfig()
 
-	storage := memstorage.New()
+	storage := memstorage.New(&memstorage.Config{
+		FileStoragePath: "",
+		StoreInterval:   0,
+		SyncStore:       false,
+	})
+
 	collector := metricscollector.New(storage)
 	collectionServiceClient := garbagecollector.New(`http://` + config.ServerEndpoint)
 
