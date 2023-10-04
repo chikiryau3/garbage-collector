@@ -56,6 +56,8 @@ func (s *storage) RunStorageDumper() <-chan error {
 }
 
 func (s *storage) RestoreFromDump() error {
+	fmt.Print("STORAGE RESTORE START")
+
 	var storageData StorageData
 
 	flags := os.O_RDONLY | os.O_CREATE
@@ -64,18 +66,22 @@ func (s *storage) RestoreFromDump() error {
 		return fmt.Errorf("restore from dump error %w", err)
 	}
 
+	fmt.Print("FILE OPENED")
+
 	var buf []byte
 	_, err = file.Read(buf)
 	if err != nil {
 		return fmt.Errorf("restore from dump error %w", err)
 	}
 	if err := json.Unmarshal(buf, &storageData); err != nil {
-		return err
+		return fmt.Errorf("restore from dump error %w", err)
 	}
 
 	if storageData != nil {
 		s.data = storageData
 	}
+
+	fmt.Printf("STORAGE RESTORED %#v \n", s.data)
 
 	return nil
 }
