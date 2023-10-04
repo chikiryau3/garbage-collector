@@ -36,9 +36,7 @@ func LoadServiceConfig() *ServiceConfig {
 	config := &ServiceConfig{}
 
 	if endpoint, ok := os.LookupEnv(`ADDRESS`); ok {
-		return &ServiceConfig{
-			Endpoint: endpoint,
-		}
+		config.Endpoint = endpoint
 	} else {
 		config.Endpoint = *args.endpoint
 	}
