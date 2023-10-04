@@ -25,7 +25,7 @@ func main() {
 	storage := memstorage.New(&memstorage.Config{
 		FileStoragePath: config.FileStoragePath,
 		StoreInterval:   time.Second * time.Duration(config.StoreInterval),
-		SyncStore:       false,
+		SyncStore:       config.StoreInterval == 0,
 	})
 
 	log.Infof("%#v", config)
