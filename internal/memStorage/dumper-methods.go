@@ -29,6 +29,8 @@ func (s *storage) dumpStorage() error {
 	if err != nil {
 		return err
 	}
+
+	return nil
 }
 
 func (s *storage) RunStorageDumper() error {
