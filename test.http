@@ -1,5 +1,5 @@
 ### counter valid
-POST /update/gauge/testSetGet136/247402.655 HTTP/1.1
+POST /update/counter/testSetGet1/232 HTTP/1.1
 Host: localhost:8080
 Content-Length: 0
 Content-Type: text/plain

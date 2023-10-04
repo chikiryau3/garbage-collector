@@ -13,7 +13,6 @@ import (
 
 func (s *service) formatGaugeInput(metricNameRaw any, metricValueRaw any) (string, float64, error) {
 	metricName := metricNameRaw.(string)
-	//mValue := *metricValueRaw
 	metricValueStr, ok := metricValueRaw.(string)
 
 	metricValueParsed, err := strconv.ParseFloat(metricValueStr, 64)
@@ -28,7 +27,6 @@ func (s *service) formatGaugeInput(metricNameRaw any, metricValueRaw any) (strin
 
 func (s *service) formatCounterInput(metricNameRaw any, metricValueRaw any) (string, int64, error) {
 	metricName := metricNameRaw.(string)
-	//mValue := *metricValueRaw
 	metricValueStr, ok := metricValueRaw.(string)
 	metricValueParsed, err := strconv.ParseInt(metricValueStr, 10, 64)
 

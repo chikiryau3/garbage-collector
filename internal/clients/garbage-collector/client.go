@@ -45,15 +45,12 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 		return err
 	}
 
-	//fmt.Printf("SendGauge body %s ", body)
-
 	req, err := http.NewRequest(
 		http.MethodPost,
 		c.serviceURL+`/update/`,
-		//bytes.NewBuffer(body),
 		&buf,
 	)
-	//req.Close = true
+
 	if err != nil {
 		return fmt.Errorf("request build err %w", err)
 	}
@@ -96,9 +93,6 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 		return fmt.Errorf(" %w", err)
 	}
 
-	//fmt.Printf("SendCounter %#v", mData)
-	//fmt.Printf("SendCounter body %s\n", body)
-
 	var buf bytes.Buffer
 	g := gzip.NewWriter(&buf)
 	if _, err = g.Write(body); err != nil {
@@ -110,13 +104,11 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 	req, err := http.NewRequest(
 		http.MethodPost,
 		c.serviceURL+`/update/`,
-		//bytes.NewBuffer(body),
 		&buf,
 	)
 	if err != nil {
 		return fmt.Errorf("request build err %w", err)
 	}
-	//req.Close = true
 
 	req.Header.Add("Content-type", "application/json")
 	req.Header.Add("Content-encoding", "gzip")
@@ -128,14 +120,6 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 		fmt.Println(fmt.Errorf("do request err %w", err))
 		return nil
 	}
-
-	//bodyBytes, err := io.ReadAll(res.Body)
-	//if err != nil {
-	//	fmt.Println(fmt.Errorf("body read err %w", err))
-	//	return nil
-	//}
-	//bodyString := string(bodyBytes)
-	//fmt.Printf("SEND COUNTRE res %s\n", bodyString)
 
 	err = res.Body.Close()
 	if err != nil {
