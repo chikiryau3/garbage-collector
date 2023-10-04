@@ -38,10 +38,12 @@ func main() {
 
 	if config.FileStoragePath != "" {
 		errs := storage.RunStorageDumper()
-		err := <-errs
-		if err != nil {
-			log.Error(err)
-		}
+		go func() {
+			err := <-errs
+			if err != nil {
+				log.Error(err)
+			}
+		}()
 	}
 
 	collector := metricscollector.New(storage)
