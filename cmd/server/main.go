@@ -25,20 +25,20 @@ func main() {
 	storage := memstorage.New(&memstorage.Config{
 		FileStoragePath: config.FileStoragePath,
 		StoreInterval:   time.Second * time.Duration(config.StoreInterval),
-		SyncStore:       config.StoreInterval == 0,
+		SyncStore:       false,
 	})
 
-	log.Info(config)
+	log.Infof("%#v", config)
 
-	//if config.Restore {
-	//	err = storage.RestoreFromDump()
-	//	log.Error(err)
-	//}
+	if config.Restore {
+		err = storage.RestoreFromDump()
+		log.Error(err)
+	}
 
-	//if config.FileStoragePath != "" {
-	//	err = storage.RunStorageDumper()
-	//	log.Error(err)
-	//}
+	if config.FileStoragePath != "" {
+		err = storage.RunStorageDumper()
+		log.Error(err)
+	}
 
 	collector := metricscollector.New(storage)
 	service := service2.New(collector, log)
