@@ -1,6 +1,8 @@
 package metricscollector
 
-import "github.com/chikiryau3/garbage-collector/internal/memStorage"
+import (
+	"github.com/chikiryau3/garbage-collector/internal/memStorage"
+)
 
 // MetricsCollector интерфейс, содержащий бизнес-логику нашего сервиса
 // это пока выглядит как прокси к стораджу (но все же логика формирования данных к самому стораджу отношения не имеет)

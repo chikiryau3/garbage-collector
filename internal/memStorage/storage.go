@@ -1,6 +1,11 @@
 package memstorage
 
-import "sync"
+import (
+	"fmt"
+	"os"
+	"sync"
+	"time"
+)
 
 type StorageData map[string]any
 
@@ -12,17 +17,51 @@ type MemStorage interface {
 	WriteMetric(name string, value any) error
 	ReadMetric(name string) (any, bool)
 	GetData() (*StorageData, error)
+
+	RunStorageDumper() error
+	RestoreFromDump() error
+}
+
+type Config struct {
+	FileStoragePath string
+	StoreInterval   time.Duration
+	SyncStore       bool
 }
 
 type storage struct {
-	data StorageData
+	data   StorageData
+	config *Config
 	sync.Mutex
+}
+
+func appendDataToFile(path string, data []byte) error {
+	flags := os.O_WRONLY | os.O_CREATE | os.O_APPEND
+	file, err := os.OpenFile(path, flags, 0666)
+	defer file.Close()
+
+	if err != nil {
+		return err
+	}
+
+	_, err = file.Write(data)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *storage) WriteMetric(name string, value any) error {
 	s.Lock()
 	defer s.Unlock()
 	s.data[name] = value
+
+	if s.config.SyncStore {
+		err := appendDataToFile(s.config.FileStoragePath, []byte(fmt.Sprintf("\"%s\":\"%v\"", name, value)))
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
@@ -42,8 +81,9 @@ func (s *storage) GetData() (*StorageData, error) {
 	return &s.data, nil
 }
 
-func New() MemStorage {
+func New(c *Config) MemStorage {
 	return &storage{
-		data: map[string]any{},
+		data:   map[string]any{},
+		config: c,
 	}
 }
