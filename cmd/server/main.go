@@ -38,8 +38,8 @@ func main() {
 
 	if config.FileStoragePath != "" {
 		errs := storage.RunStorageDumper()
-		select {
-		case err := <-errs:
+		err := <-errs
+		if err != nil {
 			log.Error(err)
 		}
 	}
