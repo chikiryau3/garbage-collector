@@ -38,20 +38,21 @@ func (s *storage) dumpStorage() error {
 	return nil
 }
 
-func (s *storage) RunStorageDumper() error {
+func (s *storage) RunStorageDumper() <-chan error {
+	errs := make(chan error, 1)
 	ticker := time.NewTicker(s.config.StoreInterval)
 
 	go func() {
 		for range ticker.C {
 			err := s.dumpStorage()
 			if err != nil {
-				fmt.Print(fmt.Errorf("dumper error %e", err))
+				errs <- fmt.Errorf("dumper error %e", err)
 				return
 			}
 		}
 	}()
 
-	return nil
+	return errs
 }
 
 func (s *storage) RestoreFromDump() error {

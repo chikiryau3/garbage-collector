@@ -18,7 +18,7 @@ type MemStorage interface {
 	ReadMetric(name string) (any, bool)
 	GetData() (*StorageData, error)
 
-	RunStorageDumper() error
+	RunStorageDumper() <-chan error
 	RestoreFromDump() error
 }
 

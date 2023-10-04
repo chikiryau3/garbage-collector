@@ -37,8 +37,11 @@ func main() {
 	}
 
 	if config.FileStoragePath != "" {
-		err = storage.RunStorageDumper()
-		log.Error(err)
+		errs := storage.RunStorageDumper()
+		select {
+		case err := <-errs:
+			log.Error(err)
+		}
 	}
 
 	collector := metricscollector.New(storage)
