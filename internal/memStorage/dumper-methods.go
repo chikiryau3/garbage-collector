@@ -56,7 +56,7 @@ func (s *storage) RunStorageDumper() <-chan error {
 }
 
 func (s *storage) RestoreFromDump() error {
-	fmt.Print("STORAGE RESTORE START")
+	fmt.Print("STORAGE RESTORE START\n")
 
 	var storageData StorageData
 
@@ -66,10 +66,9 @@ func (s *storage) RestoreFromDump() error {
 		return fmt.Errorf("restore from dump error %w", err)
 	}
 
-	fmt.Print("FILE OPENED")
-
 	var buf []byte
 	_, err = file.Read(buf)
+	fmt.Printf("FILE OPENED \n %s \n", string(buf))
 	if err != nil {
 		return fmt.Errorf("restore from dump error %w", err)
 	}
