@@ -56,6 +56,9 @@ func (s *storage) RestoreFromDump() error {
 
 	flags := os.O_RDONLY | os.O_CREATE
 	file, err := os.OpenFile(s.config.FileStoragePath, flags, 0666)
+	if err != nil {
+		return err
+	}
 
 	var buf []byte
 	_, err = file.Read(buf)
@@ -66,7 +69,9 @@ func (s *storage) RestoreFromDump() error {
 		return err
 	}
 
-	s.data = *storageData
+	if storageData != nil {
+		s.data = *storageData
+	}
 
 	return nil
 }
