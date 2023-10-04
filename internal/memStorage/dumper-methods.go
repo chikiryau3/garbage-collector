@@ -52,7 +52,7 @@ func (s *storage) RunStorageDumper() error {
 }
 
 func (s *storage) RestoreFromDump() error {
-	var storageData *StorageData
+	var storageData StorageData
 
 	flags := os.O_RDONLY | os.O_CREATE
 	file, err := os.OpenFile(s.config.FileStoragePath, flags, 0666)
@@ -65,12 +65,12 @@ func (s *storage) RestoreFromDump() error {
 	if err != nil {
 		return err
 	}
-	if err := json.Unmarshal(buf, storageData); err != nil {
+	if err := json.Unmarshal(buf, &storageData); err != nil {
 		return err
 	}
 
 	if storageData != nil {
-		s.data = *storageData
+		s.data = storageData
 	}
 
 	return nil
