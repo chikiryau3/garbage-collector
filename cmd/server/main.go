@@ -21,14 +21,16 @@ func main() {
 	log := *logger.Sugar()
 
 	config := configs.LoadServiceConfig()
-
-	storage := memstorage.New(&memstorage.Config{
+	mc := &memstorage.Config{
 		FileStoragePath: config.FileStoragePath,
 		StoreInterval:   time.Second * time.Duration(config.StoreInterval),
 		SyncStore:       config.StoreInterval == 0,
-	})
+	}
 
-	log.Infof("%#v", config)
+	storage := memstorage.New(mc)
+
+	log.Infof("CONFIG %#v", config)
+	log.Infof("MCONFIG %#v", mc)
 
 	if config.Restore {
 		err = storage.RestoreFromDump()
