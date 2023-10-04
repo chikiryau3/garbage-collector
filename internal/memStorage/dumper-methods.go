@@ -60,7 +60,7 @@ func (s *storage) RestoreFromDump() error {
 
 	var storageData StorageData
 
-	flags := os.O_RDONLY | os.O_CREATE
+	flags := os.O_RDONLY
 	file, err := os.OpenFile(s.config.FileStoragePath, flags, 0666)
 	if err != nil {
 		return fmt.Errorf("restore from dump error %w", err)
