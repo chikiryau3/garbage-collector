@@ -29,7 +29,7 @@ func (s *storage) dumpStorage() error {
 		return fmt.Errorf("dump storage error %w", err)
 	}
 
-	j = append(j, '\n')
+	//j = append(j, '\n')
 	_, err = file.Write(j)
 	if err != nil {
 		return fmt.Errorf("dump storage error %w", err)
