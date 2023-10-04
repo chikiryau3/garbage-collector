@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -29,6 +30,7 @@ func main() {
 
 	storage := memstorage.New(mc)
 
+	log.Infof("ENV %#v", os.Environ())
 	log.Infof("CONFIG %#v", config)
 	log.Infof("MCONFIG %#v", mc)
 
