@@ -135,12 +135,14 @@ func (s *service) CounterHandler(w http.ResponseWriter, r *http.Request) {
 	metricName, metricValue, err := s.formatCounterInput(mdata.name, mdata.value)
 
 	if err != nil {
+		s.log.Error(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	_, err = s.collector.SetCount(metricName, metricValue)
 	if err != nil {
+		s.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -154,12 +156,14 @@ func (s *service) GaugeHandler(w http.ResponseWriter, r *http.Request) {
 	mdata := extractMetricsData(r)
 	metricName, metricValue, err := s.formatGaugeInput(mdata.name, mdata.value)
 	if err != nil {
+		s.log.Error(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	_, err = s.collector.SetGauge(metricName, metricValue)
 	if err != nil {
+		s.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
