@@ -2,6 +2,7 @@ package configs
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"strconv"
 )
@@ -29,6 +30,9 @@ func LoadServiceConfig() *ServiceConfig {
 	}
 
 	flag.Parse()
+
+	fmt.Printf("ARGS %#v", args)
+
 	config := &ServiceConfig{}
 
 	if endpoint, ok := os.LookupEnv(`ADDRESS`); ok {
