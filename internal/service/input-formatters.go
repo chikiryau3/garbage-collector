@@ -16,7 +16,6 @@ func (s *service) formatGaugeInput(metricNameRaw any, metricValueRaw any) (strin
 	metricValueStr, ok := metricValueRaw.(string)
 
 	metricValueParsed, err := strconv.ParseFloat(metricValueStr, 64)
-	//s.log.Debug("formatGaugeInput", "| metricName:", metricName, "| metricValueRaw:", metricValueRaw, "| metricValueStr:", metricValueStr, "| metricValueParsed:", metricValueParsed)
 
 	if err != nil || !ok {
 		return ``, 0, fmt.Errorf("BAD INPUT %v %v", metricName, metricValueRaw)

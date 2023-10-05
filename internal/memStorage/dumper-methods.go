@@ -25,7 +25,6 @@ func (s *storage) dumpStorage() error {
 	}
 
 	j, err := json.Marshal(data)
-	fmt.Printf("JSON DUMP %s \n", j)
 
 	if err != nil {
 		return fmt.Errorf("dump storage error %w", err)
