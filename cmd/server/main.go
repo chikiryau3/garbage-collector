@@ -6,7 +6,6 @@ import (
 	"github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	service2 "github.com/chikiryau3/garbage-collector/internal/service"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"go.uber.org/zap"
 	"net/http"
 	"time"
@@ -30,8 +29,6 @@ func main() {
 
 	storage := memstorage.New(mc)
 
-	log.Infof("CONFIG %#v", config)
-
 	if config.Restore {
 		err = storage.RestoreFromDump()
 		if err != nil {
@@ -53,8 +50,8 @@ func main() {
 	service := service2.New(collector, log)
 
 	router := chi.NewRouter()
-	router.Use(middleware.Logger)
-	//router.Use(service.WithLogging)
+	//router.Use(middleware.Logger)
+	router.Use(service.WithLogging)
 	router.Use(service2.GzipMiddleware)
 
 	router.Route(`/update`, func(r chi.Router) {
@@ -84,7 +81,7 @@ func main() {
 	})
 
 	router.Get(`/`, service.GetMetricsHTML)
-	log.Info("LISTEN")
+
 	err = http.ListenAndServe(config.Endpoint, router)
 
 	if err != nil {

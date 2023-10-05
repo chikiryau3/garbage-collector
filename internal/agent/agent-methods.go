@@ -90,8 +90,6 @@ func (a *agent) RunPollChron() error {
 }
 
 func (a *agent) sendReport() error {
-	fmt.Print("SEND")
-
 	collectedData, err := a.collector.ReadStorage()
 	if err != nil {
 		return fmt.Errorf("send metrics error %w", err)

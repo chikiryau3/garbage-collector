@@ -23,20 +23,16 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	metricValue, err := s.collector.GetMetric(mdata.ID)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
 	if mdata.MType == `gauge` {
-		value, err := s.collector.GetMetric(mdata.ID)
-		if err != nil {
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
-		mdata.Value = value
+		mdata.Value = metricValue
 	} else if mdata.MType == `counter` {
-		value, err := s.collector.GetMetric(mdata.ID)
-		if err != nil {
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
-		mdata.Delta = value
+		mdata.Delta = metricValue
 	}
 
 	resp, err := json.Marshal(mdata)
