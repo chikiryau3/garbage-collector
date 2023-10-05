@@ -77,9 +77,6 @@ func (s *storage) ReadMetric(name string) (any, bool) {
 }
 
 func (s *storage) GetData() (*StorageData, error) {
-	s.Lock()
-	defer s.Unlock()
-
 	return &s.data, nil
 }
 

@@ -34,7 +34,9 @@ func main() {
 
 	if config.Restore {
 		err = storage.RestoreFromDump()
-		log.Error(err)
+		if err != nil {
+			log.Error(err)
+		}
 	}
 
 	if config.FileStoragePath != "" {
@@ -82,7 +84,7 @@ func main() {
 	})
 
 	router.Get(`/`, service.GetMetricsHTML)
-
+	log.Info("LISTEN")
 	err = http.ListenAndServe(config.Endpoint, router)
 
 	if err != nil {

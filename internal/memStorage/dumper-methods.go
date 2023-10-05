@@ -31,8 +31,9 @@ func (s *storage) dumpStorage() error {
 		return fmt.Errorf("dump storage error %w", err)
 	}
 
-	//j = append(j, '\n')
 	_, err = file.Write(j)
+
+	fmt.Printf("DUMP %s", j)
 	if err != nil {
 		return fmt.Errorf("dump storage error %w", err)
 	}
@@ -47,6 +48,7 @@ func (s *storage) RunStorageDumper() <-chan error {
 	go func() {
 		for range ticker.C {
 			err := s.dumpStorage()
+
 			if err != nil {
 				errs <- fmt.Errorf("dumper error %e", err)
 				return
@@ -60,31 +62,20 @@ func (s *storage) RunStorageDumper() <-chan error {
 func (s *storage) RestoreFromDump() error {
 	s.Lock()
 	defer s.Unlock()
-	fmt.Print("STORAGE RESTORE START\n")
 
 	var storageData StorageData
+	data, err := os.ReadFile(s.config.FileStoragePath)
 
-	flags := os.O_RDONLY
-	file, err := os.OpenFile(s.config.FileStoragePath, flags, 0666)
 	if err != nil {
 		return fmt.Errorf("restore from dump error %w", err)
 	}
-
-	var buf []byte
-	_, err = file.Read(buf)
-	fmt.Printf("FILE OPENED \n %s \n", string(buf))
-	if err != nil {
-		return fmt.Errorf("restore from dump error %w", err)
-	}
-	if err := json.Unmarshal(buf, &storageData); err != nil {
+	if err := json.Unmarshal(data, &storageData); err != nil {
 		return fmt.Errorf("restore from dump error %w", err)
 	}
 
 	if storageData != nil {
 		s.data = storageData
 	}
-
-	fmt.Printf("STORAGE RESTORED %#v \n", s.data)
 
 	return nil
 }

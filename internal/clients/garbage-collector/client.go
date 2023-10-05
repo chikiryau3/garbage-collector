@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/chikiryau3/garbage-collector/internal/service"
+	"io"
 	"net/http"
 )
 
@@ -23,6 +24,16 @@ func New(serviceURL string) Client {
 	return &client{
 		serviceURL: serviceURL,
 	}
+}
+
+func logResBody(r *http.Response, key string) {
+	bodyBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		fmt.Println(fmt.Errorf("body read err %w", err))
+		return
+	}
+	bodyString := string(bodyBytes)
+	fmt.Printf("SEND %s res %s\n", key, bodyString)
 }
 
 func (c *client) SendGauge(metricName string, metricValue float64) error {
@@ -66,15 +77,9 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 		return nil
 	}
 
-	//bodyBytes, err := io.ReadAll(res.Body)
-	//if err != nil {
-	//	fmt.Println(fmt.Errorf("body read err %w", err))
-	//	return nil
-	//}
-	//bodyString := string(bodyBytes)
-	//fmt.Printf("SEND GAUGE res %s\n", bodyString)
-
+	logResBody(res, `gauge`)
 	err = res.Body.Close()
+
 	if err != nil {
 		return fmt.Errorf("body close err %w", err)
 	}
@@ -120,6 +125,7 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 		fmt.Println(fmt.Errorf("do request err %w", err))
 		return nil
 	}
+	logResBody(res, `counter`)
 
 	err = res.Body.Close()
 	if err != nil {
