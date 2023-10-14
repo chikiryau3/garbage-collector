@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func ReadJsonBody(body io.ReadCloser, out interface{}) error {
+func ReadJSONBody(body io.ReadCloser, out interface{}) error {
 	var buf bytes.Buffer
 	_, err := buf.ReadFrom(body)
 
@@ -23,7 +23,7 @@ func ReadJsonBody(body io.ReadCloser, out interface{}) error {
 	return nil
 }
 
-func WriteJsonBody(w http.ResponseWriter, data interface{}) error {
+func WriteJSONBody(w http.ResponseWriter, data interface{}) error {
 	resp, err := json.Marshal(data)
 	if err != nil {
 		return fmt.Errorf("response body json error %w", err)

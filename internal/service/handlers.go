@@ -10,7 +10,7 @@ import (
 // ValueHandler берет данные для обновления метрики из тела запроса (json)
 func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 	var mdata MetricsRes
-	if err := ReadJsonBody(r.Body, mdata); err != nil {
+	if err := ReadJSONBody(r.Body, mdata); err != nil {
 		s.log.Error("ValueHandler body parsing error", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -29,7 +29,7 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 		mdata.Delta = metricValue
 	}
 
-	err = WriteJsonBody(w, mdata)
+	err = WriteJSONBody(w, mdata)
 	if err != nil {
 		s.log.Error("ValueHandler response writing error", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -43,7 +43,7 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 // UpdateHandler берет данные для обновления метрики из тела запроса (json)
 func (s *service) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 	var mdata Metrics
-	if err := ReadJsonBody(r.Body, mdata); err != nil {
+	if err := ReadJSONBody(r.Body, mdata); err != nil {
 		s.log.Error("UpdateHandler body parsing error", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -69,7 +69,7 @@ func (s *service) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 		mdata.Delta = &delta
 	}
 
-	err := WriteJsonBody(w, mdata)
+	err := WriteJSONBody(w, mdata)
 	if err != nil {
 		s.log.Error("UpdateHandler response writing error", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -112,7 +112,7 @@ func extractMetricsData(r *http.Request) MetricData {
 // CounterHandler берет данные для обновления значения из урла
 func (s *service) CounterHandler(w http.ResponseWriter, r *http.Request) {
 	mdata := extractMetricsData(r)
-	metricValue, err := strconv.ParseInt(mdata.name, 10, 64)
+	metricValue, err := strconv.ParseInt(mdata.value, 10, 64)
 	if err != nil {
 		s.log.Error("CounterHandler metric value parsing error", err)
 		w.WriteHeader(http.StatusBadRequest)
