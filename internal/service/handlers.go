@@ -10,15 +10,11 @@ import (
 // ValueHandler берет данные для обновления метрики из тела запроса (json)
 func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 	var mdata MetricsRes
-	s.log.Infoln("BODY", r.Body)
-
 	if err := ReadJSONBody(r.Body, &mdata); err != nil {
 		s.log.Error("ValueHandler body parsing error", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	s.log.Infoln("MDATA", mdata)
 
 	metricValue, err := s.collector.GetMetric(mdata.ID)
 	if err != nil {
