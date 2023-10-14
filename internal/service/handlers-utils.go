@@ -16,7 +16,7 @@ func ReadJSONBody(body io.ReadCloser, out interface{}) error {
 		return fmt.Errorf("read request body error %w", err)
 	}
 
-	if err = json.Unmarshal(buf.Bytes(), &out); err != nil {
+	if err = json.Unmarshal(buf.Bytes(), out); err != nil {
 		return fmt.Errorf("requset body json error %w", err)
 	}
 
