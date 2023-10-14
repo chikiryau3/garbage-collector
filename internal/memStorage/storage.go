@@ -80,6 +80,12 @@ func (s *storage) GetData() (*StorageData, error) {
 	return &s.data, nil
 }
 
+var DefaultConfig = &Config{
+	FileStoragePath: "",
+	StoreInterval:   0,
+	SyncStore:       false,
+}
+
 func New(c *Config) MemStorage {
 	return &storage{
 		data:   map[string]any{},

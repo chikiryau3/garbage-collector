@@ -2,55 +2,40 @@ package main
 
 import (
 	"github.com/chikiryau3/garbage-collector/internal/configs"
+	"github.com/chikiryau3/garbage-collector/internal/logger"
 	"github.com/chikiryau3/garbage-collector/internal/memStorage"
 	"github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	service2 "github.com/chikiryau3/garbage-collector/internal/service"
+	"github.com/chikiryau3/garbage-collector/internal/utils"
 	"github.com/go-chi/chi/v5"
-	"go.uber.org/zap"
 	"net/http"
-	"time"
 )
 
 func main() {
-	logger, err := zap.NewDevelopment()
+	log, err := logger.InitLogger()
 	if err != nil {
 		panic(err)
 	}
-	defer logger.Sync()
-
-	log := *logger.Sugar()
 
 	config := configs.LoadServiceConfig()
-	mc := &memstorage.Config{
-		FileStoragePath: config.FileStoragePath,
-		StoreInterval:   time.Second * time.Duration(config.StoreInterval),
-		SyncStore:       config.StoreInterval == 0,
-	}
-
-	storage := memstorage.New(mc)
+	storage := memstorage.New(config.StorageConfig)
 
 	if config.Restore {
 		err = storage.RestoreFromDump()
 		if err != nil {
-			log.Error(err)
+			log.Error("restore from dump error", err)
 		}
 	}
 
 	if config.FileStoragePath != "" {
 		errs := storage.RunStorageDumper()
-		go func() {
-			err := <-errs
-			if err != nil {
-				log.Error(err)
-			}
-		}()
+		go utils.ListenForErrors(errs, "storage dumper error", log.Error)
 	}
 
 	collector := metricscollector.New(storage)
 	service := service2.New(collector, log)
 
 	router := chi.NewRouter()
-	//router.Use(middleware.Logger)
 	router.Use(service.WithLogging)
 	router.Use(service2.GzipMiddleware)
 

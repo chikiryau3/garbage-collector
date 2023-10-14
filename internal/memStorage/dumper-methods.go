@@ -32,7 +32,6 @@ func (s *storage) dumpStorage() error {
 
 	_, err = file.Write(j)
 
-	fmt.Printf("DUMP %s", j)
 	if err != nil {
 		return fmt.Errorf("dump storage error %w", err)
 	}

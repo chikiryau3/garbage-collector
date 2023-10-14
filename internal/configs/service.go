@@ -2,8 +2,10 @@ package configs
 
 import (
 	"flag"
+	memstorage "github.com/chikiryau3/garbage-collector/internal/memStorage"
 	"os"
 	"strconv"
+	"time"
 )
 
 type ServiceConfig struct {
@@ -11,6 +13,7 @@ type ServiceConfig struct {
 	FileStoragePath string
 	Restore         bool
 	Endpoint        string
+	StorageConfig   *memstorage.Config
 }
 
 type ServiceCLIArgs struct {
@@ -59,6 +62,12 @@ func LoadServiceConfig() *ServiceConfig {
 		config.Restore = restore == `true`
 	} else {
 		config.Restore = *args.restore
+	}
+
+	config.StorageConfig = &memstorage.Config{
+		FileStoragePath: config.FileStoragePath,
+		StoreInterval:   time.Second * time.Duration(config.StoreInterval),
+		SyncStore:       config.StoreInterval == 0,
 	}
 
 	return config

@@ -2,8 +2,10 @@ package configs
 
 import (
 	"flag"
+	"github.com/chikiryau3/garbage-collector/internal/agent"
 	"os"
 	"strconv"
+	"time"
 )
 
 type AgentCLIArgs struct {
@@ -18,7 +20,7 @@ type AgentConfig struct {
 	PollInterval   int64
 }
 
-func LoadAgentConfig() *AgentConfig {
+func LoadAgentConfig() agent.Config {
 	args := &AgentCLIArgs{
 		serverEndpoint: flag.String("a", "localhost:8080", "service endpoint"),
 		reportInterval: flag.Int64("r", 10, "report interval (seconds)"),
@@ -57,5 +59,9 @@ func LoadAgentConfig() *AgentConfig {
 		config.ReportInterval = *args.reportInterval
 	}
 
-	return config
+	return agent.Config{
+		ServerEndpoint: config.ServerEndpoint,
+		PollInterval:   time.Second * time.Duration(config.PollInterval),
+		ReportInterval: time.Second * time.Duration(config.ReportInterval),
+	}
 }

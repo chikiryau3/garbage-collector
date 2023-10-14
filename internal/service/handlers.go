@@ -1,30 +1,24 @@
 package service
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"net/http"
+	"strconv"
 )
 
+// ValueHandler берет данные для обновления метрики из тела запроса (json)
 func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
-	var buf bytes.Buffer
-	_, err := buf.ReadFrom(r.Body)
-
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
 	var mdata MetricsRes
-	if err = json.Unmarshal(buf.Bytes(), &mdata); err != nil {
+	if err := ReadJsonBody(r.Body, mdata); err != nil {
+		s.log.Error("ValueHandler body parsing error", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	metricValue, err := s.collector.GetMetric(mdata.ID)
 	if err != nil {
+		s.log.Error("ValueHandler get metric error", err)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -35,40 +29,30 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 		mdata.Delta = metricValue
 	}
 
-	resp, err := json.Marshal(mdata)
+	err = WriteJsonBody(w, mdata)
 	if err != nil {
+		s.log.Error("ValueHandler response writing error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
-
-	_, err = w.Write(resp)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
 }
 
+// UpdateHandler берет данные для обновления метрики из тела запроса (json)
 func (s *service) UpdateHandler(w http.ResponseWriter, r *http.Request) {
-	var buf bytes.Buffer
-	_, err := buf.ReadFrom(r.Body)
-
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
 	var mdata Metrics
-	if err = json.Unmarshal(buf.Bytes(), &mdata); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+	if err := ReadJsonBody(r.Body, mdata); err != nil {
+		s.log.Error("UpdateHandler body parsing error", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	if mdata.MType == `gauge` {
 		value, err := s.collector.SetGauge(mdata.ID, *mdata.Value)
 		if err != nil {
+			s.log.Error("UpdateHandler set gauge error", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -77,6 +61,7 @@ func (s *service) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 	} else if mdata.MType == `counter` {
 		delta, err := s.collector.SetCount(mdata.ID, *mdata.Delta)
 		if err != nil {
+			s.log.Error("UpdateHandler set counter error", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -84,25 +69,22 @@ func (s *service) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 		mdata.Delta = &delta
 	}
 
-	resp, err := json.Marshal(mdata)
+	err := WriteJsonBody(w, mdata)
 	if err != nil {
+		s.log.Error("UpdateHandler response writing error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
-
-	_, err = w.Write(resp)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
 }
 
+// GetMetricsHTML отдает текущий сторадж в виде строки
 func (s *service) GetMetricsHTML(w http.ResponseWriter, r *http.Request) {
 	data, err := s.collector.ReadStorage()
 	if err != nil {
+		s.log.Error("GetMetricsHTML read storage error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -111,6 +93,7 @@ func (s *service) GetMetricsHTML(w http.ResponseWriter, r *http.Request) {
 
 	_, err = w.Write([]byte(fmt.Sprintf("%v", data)))
 	if err != nil {
+		s.log.Error("GetMetricsHTML response writing error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -126,19 +109,19 @@ func extractMetricsData(r *http.Request) MetricData {
 	}
 }
 
+// CounterHandler берет данные для обновления значения из урла
 func (s *service) CounterHandler(w http.ResponseWriter, r *http.Request) {
 	mdata := extractMetricsData(r)
-	metricName, metricValue, err := s.formatCounterInput(mdata.name, mdata.value)
-
+	metricValue, err := strconv.ParseInt(mdata.name, 10, 64)
 	if err != nil {
-		s.log.Error(err)
+		s.log.Error("CounterHandler metric value parsing error", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	_, err = s.collector.SetCount(metricName, metricValue)
+	_, err = s.collector.SetCount(mdata.name, metricValue)
 	if err != nil {
-		s.log.Error(err)
+		s.log.Error("CounterHandler set counter metric error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -148,18 +131,19 @@ func (s *service) CounterHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// GaugeHandler берет данные для обновления значения из урла
 func (s *service) GaugeHandler(w http.ResponseWriter, r *http.Request) {
 	mdata := extractMetricsData(r)
-	metricName, metricValue, err := s.formatGaugeInput(mdata.name, mdata.value)
+	metricValue, err := strconv.ParseFloat(mdata.value, 64)
 	if err != nil {
-		s.log.Error(err)
+		s.log.Error("GaugeHandler metric value parsing error", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	_, err = s.collector.SetGauge(metricName, metricValue)
+	_, err = s.collector.SetGauge(mdata.name, metricValue)
 	if err != nil {
-		s.log.Error(err)
+		s.log.Error("GaugeHandler set gauge metric error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -169,17 +153,20 @@ func (s *service) GaugeHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// GetMetric берет имя метрики из урла
 func (s *service) GetMetric(w http.ResponseWriter, r *http.Request) {
 	mdata := extractMetricsData(r)
 
 	val, err := s.collector.GetMetric(mdata.name)
 	if err != nil {
+		s.log.Error("GetMetric error", err)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
 	_, err = w.Write([]byte(fmt.Sprintf("%v", val)))
 	if err != nil {
+		s.log.Error("GetMetric response writing error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

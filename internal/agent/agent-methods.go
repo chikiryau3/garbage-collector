@@ -43,56 +43,57 @@ func (a *agent) pollMetrics() error {
 
 	stats, err := filterFields(statsRaw)
 	if err != nil {
-		return fmt.Errorf("poll error %w", err)
+		return fmt.Errorf("filter fields error %w", err)
 	}
 
 	for metricName, metricValueRaw := range stats {
 		metricValue, ok := metricValueRaw.(float64)
 		if !ok {
-			return fmt.Errorf("poll error %w", err)
+			return fmt.Errorf("metric value type error %w", err)
 		}
 		// сохраняю метрики с тегами чтобы можно было отправить все в цикле не разбирая каждую отдельно
 		_, err := a.collector.SetGauge(`gauge:`+metricName, metricValue)
 		if err != nil {
-			return fmt.Errorf("poll error %w", err)
+			return fmt.Errorf("set gauge error %w", err)
 		}
 	}
 
 	// сохраняю метрики с тегами чтобы можно было отправить все в цикле не разбирая каждую отдельно
 	_, err = a.collector.SetCount("count:PollCount", 1)
 	if err != nil {
-		return fmt.Errorf("poll error %w", err)
+		return fmt.Errorf("set count error %w", err)
 	}
 
 	// сохраняю метрики с тегами чтобы можно было отправить все в цикле не разбирая каждую отдельно
 	_, err = a.collector.SetCount("count:RandomValue", rand.Int63())
 	if err != nil {
-		return fmt.Errorf("poll error %w", err)
+		return fmt.Errorf("set count error %w", err)
 	}
 
 	return nil
 }
 
-func (a *agent) RunPollChron() error {
+func (a *agent) RunPollChron() <-chan error {
+	errs := make(chan error, 1)
 	ticker := time.NewTicker(a.config.PollInterval)
 
 	go func() {
 		for range ticker.C {
 			err := a.pollMetrics()
 			if err != nil {
-				//fmt.Print(fmt.Errorf("poll error %e", err))
+				errs <- fmt.Errorf("poll metrics error %w", err)
 				return
 			}
 		}
 	}()
 
-	return nil
+	return errs
 }
 
 func (a *agent) sendReport() error {
 	collectedData, err := a.collector.ReadStorage()
 	if err != nil {
-		return fmt.Errorf("send metrics error %w", err)
+		return fmt.Errorf("read storage error %w", err)
 	}
 
 	for metricName, metricValueRaw := range *collectedData {
@@ -129,18 +130,19 @@ func (a *agent) sendReport() error {
 	return nil
 }
 
-func (a *agent) RunReporter() error {
+func (a *agent) RunReporter() <-chan error {
+	errs := make(chan error, 1)
 	ticker := time.NewTicker(a.config.ReportInterval)
 
 	go func() {
 		for range ticker.C {
 			err := a.sendReport()
 			if err != nil {
-				fmt.Printf("%e", err)
+				errs <- fmt.Errorf("send report error %w", err)
 				return
 			}
 		}
 	}()
 
-	return nil
+	return errs
 }

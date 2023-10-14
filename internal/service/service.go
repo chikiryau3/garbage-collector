@@ -1,41 +1,22 @@
 package service
 
 import (
+	"github.com/chikiryau3/garbage-collector/internal/logger"
 	metricscollector "github.com/chikiryau3/garbage-collector/internal/metricsCollector"
-	"go.uber.org/zap"
-	"net/http"
 )
-
-type Service interface {
-	// handlers json
-
-	UpdateHandler(w http.ResponseWriter, r *http.Request)
-	ValueHandler(w http.ResponseWriter, r *http.Request)
-
-	// handlers plain
-
-	GaugeHandler(w http.ResponseWriter, r *http.Request)
-	CounterHandler(w http.ResponseWriter, r *http.Request)
-	GetMetric(w http.ResponseWriter, r *http.Request)
-	GetMetricsHTML(w http.ResponseWriter, r *http.Request)
-
-	// middlewares
-
-	WithLogging(next http.Handler) http.Handler
-}
 
 type MetricData struct {
 	mtype string
 	name  string
-	value any
+	value string
 }
 
 type service struct {
 	collector metricscollector.MetricsCollector
-	log       zap.SugaredLogger
+	log       logger.Logger
 }
 
-func New(collector metricscollector.MetricsCollector, log zap.SugaredLogger) Service {
+func New(collector metricscollector.MetricsCollector, log logger.Logger) *service {
 	return &service{
 		collector: collector,
 		log:       log,
