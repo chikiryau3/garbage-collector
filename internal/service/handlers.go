@@ -33,14 +33,13 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 		mdata.Delta = metricValue
 	}
 
+	w.Header().Set("Content-type", "application/json")
 	err = WriteJSONBody(w, mdata)
 	if err != nil {
 		s.log.Error("ValueHandler response writing error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -72,7 +71,7 @@ func (s *service) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 		mdata.Delta = &delta
 	}
-
+	w.Header().Set("Content-type", "application/json")
 	err := WriteJSONBody(w, mdata)
 	if err != nil {
 		s.log.Error("UpdateHandler response writing error", err)
@@ -80,7 +79,6 @@ func (s *service) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
 }
 
