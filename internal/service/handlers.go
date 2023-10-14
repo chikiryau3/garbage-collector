@@ -16,6 +16,8 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	s.log.Infoln("MDATA", mdata)
+
 	metricValue, err := s.collector.GetMetric(mdata.ID)
 	if err != nil {
 		s.log.Error("ValueHandler get metric error", err)
