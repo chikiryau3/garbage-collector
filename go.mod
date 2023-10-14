@@ -7,4 +7,6 @@ require (
 	github.com/go-chi/chi/v5 v5.0.10 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/ucarion/urlpath v0.0.0-20200424170820-7ccc79b76bbb // indirect
+	go.uber.org/multierr v1.11.0 // indirect
+	go.uber.org/zap v1.26.0 // indirect
 )

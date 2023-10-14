@@ -1,6 +1,6 @@
 ### counter valid
-POST /update/counter/someMetric2/100 HTTP/1.1
-Host: localhost:8081
+POST /update/counter/testSetGet1/232 HTTP/1.1
+Host: localhost:8080
 Content-Length: 0
 Content-Type: text/plain
 
@@ -52,3 +52,23 @@ POST /update/unknown/testCounter/100 HTTP/1.1
 Host: localhost:8080
 Content-Length: 0
 Content-Type: text/plain
+
+###
+POST /value/
+Host: localhost:8080
+Content-Type: application/json
+
+{"id": "alloc", "type": "gauge", "value": null}
+
+###
+POST /value/
+Host: localhost:8080
+Content-Type: application/json
+
+{"id": "PollCount", "type": "counter", "delta": null}
+
+###
+GET /
+Host: localhost:8080
+Accept: text/html
+Accept-Encoding: gzip

@@ -5,46 +5,32 @@ import (
 	memstorage "github.com/chikiryau3/garbage-collector/internal/memStorage"
 )
 
-func (c *metricsCollector) SetGauge(name string, value float64) error {
+func (c *metricsCollector) SetGauge(name string, value float64) (float64, error) {
 	err := c.storage.WriteMetric(name, value)
 	if err != nil {
-		return fmt.Errorf("cannot write gauge metric %w", err)
+		return 0, fmt.Errorf("cannot write gauge metric %w", err)
 	}
 
-	return nil
+	return value, nil
 }
 
-func (c *metricsCollector) SetCount(name string, value int64) error {
-	currentValueRaw, ok := c.storage.ReadMetric(name)
-	// если метрика еще не представлена в storage, то пишем переданное значение
-	if !ok {
-		err := c.storage.WriteMetric(name, value)
-		if err != nil {
-			return fmt.Errorf("cannot write count metric %w", err)
-		}
-
-		return nil
-	}
-
-	// если значение метрики в storage неправильное, то подменяем на переданное
-	// UPD: не могу избавиться от этого, тк WriteMetric - это "положи в хранилку что-то"
-	// что конкретно класть (то есть какой тип) -- это бизнес-логика, она должна быть в этой структуре
-	currentValue, ok := currentValueRaw.(int64)
-	if !ok {
-		err := c.storage.WriteMetric(name, value)
-		if err != nil {
-			return fmt.Errorf("cannot write count metric %w", err)
-		}
-
-		return nil
-	}
-
-	err := c.storage.WriteMetric(name, value+currentValue)
+func (c *metricsCollector) writeCount(name string, value int64) (int64, error) {
+	err := c.storage.WriteMetric(name, value)
 	if err != nil {
-		return fmt.Errorf("cannot write count metric %w", err)
+		return 0, fmt.Errorf("cannot write count metric %w", err)
 	}
 
-	return nil
+	return value, nil
+}
+
+func (c *metricsCollector) SetCount(name string, value int64) (int64, error) {
+	if currentValueRaw, ok := c.storage.ReadMetric(name); ok {
+		if currentValue, ok := currentValueRaw.(int64); ok {
+			return c.writeCount(name, value+currentValue)
+		}
+	}
+
+	return c.writeCount(name, value)
 }
 
 func (c *metricsCollector) ReadStorage() (*memstorage.StorageData, error) {

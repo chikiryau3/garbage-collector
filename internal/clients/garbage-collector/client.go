@@ -1,7 +1,11 @@
 package garbagecollector
 
 import (
+	"bytes"
+	"compress/gzip"
+	"encoding/json"
 	"fmt"
+	"github.com/chikiryau3/garbage-collector/internal/service"
 	"net/http"
 )
 
@@ -22,52 +26,97 @@ func New(serviceURL string) Client {
 }
 
 func (c *client) SendGauge(metricName string, metricValue float64) error {
-	req, err := http.NewRequest(
-		http.MethodPost,
-		c.serviceURL+`/update/gauge/`+metricName+`/`+fmt.Sprintf("%f", metricValue),
-		nil,
-	)
+	var mData service.Metrics
+	mData.ID = metricName
+	mData.MType = `gauge`
+	mData.Value = &metricValue
+
+	body, err := json.Marshal(mData)
 	if err != nil {
 		return err
 	}
 
-	req.Header.Add("Content-type", "text/plain")
+	var buf bytes.Buffer
+	g := gzip.NewWriter(&buf)
+	if _, err = g.Write(body); err != nil {
+		return err
+	}
+	if err = g.Close(); err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(
+		http.MethodPost,
+		c.serviceURL+`/update/`,
+		&buf,
+	)
+
+	if err != nil {
+		return fmt.Errorf("request build err %w", err)
+	}
+
+	req.Header.Add("Content-type", "application/json")
+	req.Header.Add("Content-encoding", "gzip")
+	req.Header.Add("Accept-encoding", "gzip")
 
 	// пока тело ответа нам не нужно
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return err
+		fmt.Println(fmt.Errorf("do request err %w", err))
+		return nil
 	}
 
 	err = res.Body.Close()
+
 	if err != nil {
-		return err
+		return fmt.Errorf("body close err %w", err)
 	}
 
 	return nil
 }
 
 func (c *client) SendCounter(metricName string, metricValue int64) error {
-	req, err := http.NewRequest(
-		http.MethodPost,
-		c.serviceURL+`/update/counter/`+metricName+`/`+fmt.Sprintf("%d", metricValue),
-		nil,
-	)
+	var mData service.Metrics
+	mData.ID = metricName
+	mData.MType = `counter`
+	mData.Delta = &metricValue
+
+	body, err := json.Marshal(mData)
 	if err != nil {
-		return err
+		return fmt.Errorf(" %w", err)
 	}
 
-	req.Header.Add("Content-type", "text/plain")
+	var buf bytes.Buffer
+	g := gzip.NewWriter(&buf)
+	if _, err = g.Write(body); err != nil {
+		return err
+	}
+	if err = g.Close(); err != nil {
+		return err
+	}
+	req, err := http.NewRequest(
+		http.MethodPost,
+		c.serviceURL+`/update/`,
+		&buf,
+	)
+	if err != nil {
+		return fmt.Errorf("request build err %w", err)
+	}
+
+	req.Header.Add("Content-type", "application/json")
+	req.Header.Add("Content-encoding", "gzip")
+	req.Header.Add("Accept-encoding", "gzip")
 
 	// пока тело ответа нам не нужно
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return err
+		fmt.Println(fmt.Errorf("do request err %w", err))
+		return nil
 	}
 
 	err = res.Body.Close()
 	if err != nil {
-		return err
+		return fmt.Errorf("body close err %w", err)
 	}
 
 	return nil
