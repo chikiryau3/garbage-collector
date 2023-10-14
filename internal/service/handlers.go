@@ -12,7 +12,7 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 	var mdata MetricsRes
 	s.log.Infoln("BODY", r.Body)
 
-	if err := ReadJSONBody(r.Body, mdata); err != nil {
+	if err := ReadJSONBody(r.Body, &mdata); err != nil {
 		s.log.Error("ValueHandler body parsing error", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -47,7 +47,7 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 // UpdateHandler берет данные для обновления метрики из тела запроса (json)
 func (s *service) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 	var mdata Metrics
-	if err := ReadJSONBody(r.Body, mdata); err != nil {
+	if err := ReadJSONBody(r.Body, &mdata); err != nil {
 		s.log.Error("UpdateHandler body parsing error", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
