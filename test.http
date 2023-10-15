@@ -76,3 +76,10 @@ Accept-Encoding: gzip
 ###
 GET /ping
 Host: localhost:8080
+
+###
+POST /updates/
+Host: localhost:8080
+Content-Type: application/json
+
+[{"id": "alloc", "type": "gauge", "value": 123}, {"id": "randomValue", "type": "counter", "delta": 1}]

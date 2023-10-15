@@ -63,6 +63,7 @@ func (c *metricsCollector) SetBatch(batch []Metrics) error {
 	//counters := ``
 	//gauges := ``
 	for _, mdata := range batch {
+		fmt.Printf("MDATA %#v", mdata)
 		switch mdata.MType {
 		case `counter`:
 			updatedValue, err := c.SetCount(mdata.ID, *mdata.Delta)

@@ -113,7 +113,7 @@ func main() {
 	})
 
 	router.Get(`/`, service.GetMetricsHTML)
-	router.Post(`/updates`, service.BatchUpdateHandler)
+	router.Post(`/updates/`, service.BatchUpdateHandler)
 
 	err = http.ListenAndServe(config.Endpoint, router)
 
