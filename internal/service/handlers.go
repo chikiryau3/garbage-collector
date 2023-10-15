@@ -172,3 +172,29 @@ func (s *service) GetMetric(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "text/plain")
 	w.WriteHeader(http.StatusOK)
 }
+
+func (s *service) BatchUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	var batch []Metrics
+	if err := ReadJSONBody(r.Body, &batch); err != nil {
+		s.log.Error("UpdateHandler body parsing error", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err := s.collector.SetBatch(batch)
+	if err != nil {
+		s.log.Error("BatchUpdateHandler error", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-type", "application/json")
+	err = WriteJSONBody(w, batch)
+	if err != nil {
+		s.log.Error("UpdateHandler response writing error", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}

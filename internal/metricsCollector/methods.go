@@ -2,6 +2,7 @@ package metricscollector
 
 import (
 	"fmt"
+	"github.com/chikiryau3/garbage-collector/internal/service"
 )
 
 func (c *metricsCollector) SetGauge(name string, value float64) (float64, error) {
@@ -43,4 +44,46 @@ func (c *metricsCollector) GetMetric(mtype string, name string) (any, error) {
 	}
 
 	return metricValue, nil
+}
+
+//type count map[string]int64
+//type gauge map[string]float64
+//
+//func (c *metricsCollector) writeGaugeBatch(batch []service.Metrics) ([]service.Metrics, error) {
+//	for _, mdata := range batch {
+//
+//	}
+//	return nil, nil
+//}
+
+func (c *metricsCollector) SetBatch(batch []service.Metrics) error {
+	//var counters []service.Metrics
+	//var gauges []service.Metrics
+	var errs []error
+
+	//counters := ``
+	//gauges := ``
+	for _, mdata := range batch {
+		switch mdata.MType {
+		case `counter`:
+			updatedValue, err := c.SetCount(mdata.ID, *mdata.Delta)
+			if err != nil {
+				errs = append(errs, fmt.Errorf("cannot write gauge metric %w", err))
+			}
+			mdata.Delta = &updatedValue
+			//counters += `(` + mdata.ID + `)`
+			//counters = append(counters, mdata)
+			//counters[mdata.ID] = *mdata.Delta
+		case `gauge`:
+			updatedValue, err := c.SetGauge(mdata.ID, *mdata.Value)
+			if err != nil {
+				errs = append(errs, fmt.Errorf("cannot write gauge metric %w", err))
+			}
+			mdata.Value = &updatedValue
+			//gauges = append(gauges, mdata)
+			//gauges[mdata.ID] = *mdata.Value
+		}
+	}
+
+	return nil
 }

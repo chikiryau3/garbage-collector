@@ -57,10 +57,22 @@ func (s *storage) Init(ctx context.Context) error {
 
 func (s *storage) WriteMetric(mtype string, name string, value any) error {
 	// todo: think about security issue
-	//qs := fmt.Sprintf("UPDATE %s SET value=%v WHERE name=%s", mtype, value, name)
 	qs := fmt.Sprintf("INSERT INTO %s VALUES ('%s', %v) ON CONFLICT (name) DO UPDATE SET value=%v", mtype, name, value, value)
-	//qs := fmt.Sprintf("INSERT INTO %s (name, value) VALUES ('%s', %v)", mtype, name, value)
-	//fmt.Printf("\nQUERY STRING %s \n", qs)
+	res, err := s.db.Query(qs)
+	if err != nil {
+		return fmt.Errorf("cannot write %s:%v db error %w", name, value, err)
+	}
+	err = res.Err()
+	if err != nil {
+		return fmt.Errorf("cannot write %s:%v db error %w", name, value, err)
+	}
+
+	return nil
+}
+
+func (s *storage) WriteMetrics(mtype string, name string, value any) error {
+	// todo: think about security issue
+	qs := fmt.Sprintf("INSERT INTO %s VALUES ('%s', %v) ON CONFLICT (name) DO UPDATE SET value=%v", mtype, name, value, value)
 	res, err := s.db.Query(qs)
 	if err != nil {
 		return fmt.Errorf("cannot write %s:%v db error %w", name, value, err)
