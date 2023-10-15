@@ -29,7 +29,7 @@ func main() {
 	}
 	defer db.Close()
 
-	pg := pgStorage.New(db, &pgStorage.Config{})
+	_ = pgStorage.New(db, &pgStorage.Config{})
 	storage := memstorage.New(config.StorageConfig)
 
 	if config.Restore {
