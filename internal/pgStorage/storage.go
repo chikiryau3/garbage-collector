@@ -98,6 +98,7 @@ func (s *storage) GetData() (*metricscollector.StorageData, error) {
 	defer rows.Close()
 
 	var data metricscollector.StorageData
+	data = map[string]any{}
 
 	for rows.Next() {
 		var name string
