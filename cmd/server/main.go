@@ -44,7 +44,7 @@ func main() {
 		go utils.ListenForErrors(errs, "storage dumper error", log.Error)
 	}
 
-	collector := metricscollector.New(pg)
+	collector := metricscollector.New(storage)
 	service := service2.New(collector, log)
 
 	router := chi.NewRouter()
