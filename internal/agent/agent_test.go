@@ -1,7 +1,7 @@
 package agent
 
 import (
-	memstorage "github.com/chikiryau3/garbage-collector/internal/memStorage"
+	metricscollector "github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	"github.com/chikiryau3/garbage-collector/internal/mocks"
 	"github.com/golang/mock/gomock"
 	"math/rand"
@@ -70,7 +70,7 @@ func Test_agent_sendReport(t *testing.T) {
 	pollInterval := time.Second * 2
 	reportInterval := time.Second * 10
 
-	storageData := &memstorage.StorageData{
+	storageData := &metricscollector.StorageData{
 		"gauge:someGaugeMetric":  rand.Float64(),
 		"gauge:someGaugeMetric2": rand.Float64(),
 		"count:someCountMetric":  rand.Int63(),
