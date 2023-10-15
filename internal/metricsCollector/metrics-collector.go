@@ -1,9 +1,5 @@
 package metricscollector
 
-import (
-	"github.com/chikiryau3/garbage-collector/internal/memStorage"
-)
-
 // MetricsCollector интерфейс, содержащий бизнес-логику нашего сервиса
 // это пока выглядит как прокси к стораджу (но все же логика формирования данных к самому стораджу отношения не имеет)
 // когда будет БД, станет понятно зачем эта штука
@@ -14,15 +10,28 @@ type MetricsCollector interface {
 	SetGauge(name string, value float64) (float64, error)
 	SetCount(name string, value int64) (int64, error)
 
-	ReadStorage() (*memstorage.StorageData, error)
+	ReadStorage() (*StorageData, error)
 	GetMetric(name string) (any, error)
 }
 
-type metricsCollector struct {
-	storage memstorage.MemStorage
+type StorageData map[string]any
+
+// UPD: перенес объявление интерфейса в коллектор, тк он общий для разных storage
+
+type Storage interface {
+	WriteMetric(name string, value any) error
+	ReadMetric(name string) (any, bool)
+	GetData() (*StorageData, error)
+
+	RunStorageDumper() <-chan error
+	RestoreFromDump() error
 }
 
-func New(s memstorage.MemStorage) MetricsCollector {
+type metricsCollector struct {
+	storage Storage
+}
+
+func New(s Storage) MetricsCollector {
 	return &metricsCollector{
 		storage: s,
 	}

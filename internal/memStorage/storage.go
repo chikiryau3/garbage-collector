@@ -2,25 +2,17 @@ package memstorage
 
 import (
 	"fmt"
+	metricscollector "github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	"os"
 	"sync"
 	"time"
 )
 
-type StorageData map[string]any
-
 // MemStorage -- интерфейс для работы с хранилищем, "читать и писать"
 // сейчас это просто мапа в памяти, но когда-нибудь это станет базой
 // в таком случае, можно будет реализовать этот же интерфейс, но с логикой для работы с БД
 // поэтому это именно интерфейс (ну и чтобы замокать)
-type MemStorage interface {
-	WriteMetric(name string, value any) error
-	ReadMetric(name string) (any, bool)
-	GetData() (*StorageData, error)
-
-	RunStorageDumper() <-chan error
-	RestoreFromDump() error
-}
+type MemStorage metricscollector.Storage
 
 type Config struct {
 	FileStoragePath string
@@ -29,7 +21,7 @@ type Config struct {
 }
 
 type storage struct {
-	data   StorageData
+	data   metricscollector.StorageData
 	config *Config
 	sync.Mutex
 }
@@ -76,7 +68,7 @@ func (s *storage) ReadMetric(name string) (any, bool) {
 	return value, ok
 }
 
-func (s *storage) GetData() (*StorageData, error) {
+func (s *storage) GetData() (*metricscollector.StorageData, error) {
 	return &s.data, nil
 }
 

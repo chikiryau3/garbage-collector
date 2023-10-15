@@ -72,3 +72,7 @@ GET /
 Host: localhost:8080
 Accept: text/html
 Accept-Encoding: gzip
+
+###
+GET /ping
+Host: localhost:8080

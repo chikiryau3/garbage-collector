@@ -2,7 +2,6 @@ package metricscollector
 
 import (
 	"fmt"
-	memstorage "github.com/chikiryau3/garbage-collector/internal/memStorage"
 )
 
 func (c *metricsCollector) SetGauge(name string, value float64) (float64, error) {
@@ -33,7 +32,7 @@ func (c *metricsCollector) SetCount(name string, value int64) (int64, error) {
 	return c.writeCount(name, value)
 }
 
-func (c *metricsCollector) ReadStorage() (*memstorage.StorageData, error) {
+func (c *metricsCollector) ReadStorage() (*StorageData, error) {
 	return c.storage.GetData()
 }
 
