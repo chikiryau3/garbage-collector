@@ -35,18 +35,18 @@ func (m *MetricsCollectorMock) EXPECT() *MetricsCollectorMockMockRecorder {
 }
 
 // GetMetric mocks base method.
-func (m *MetricsCollectorMock) GetMetric(name string) (any, error) {
+func (m *MetricsCollectorMock) GetMetric(mtype, name string) (any, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMetric", name)
+	ret := m.ctrl.Call(m, "GetMetric", mtype, name)
 	ret0, _ := ret[0].(any)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetMetric indicates an expected call of GetMetric.
-func (mr *MetricsCollectorMockMockRecorder) GetMetric(name interface{}) *gomock.Call {
+func (mr *MetricsCollectorMockMockRecorder) GetMetric(mtype, name interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMetric", reflect.TypeOf((*MetricsCollectorMock)(nil).GetMetric), name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMetric", reflect.TypeOf((*MetricsCollectorMock)(nil).GetMetric), mtype, name)
 }
 
 // ReadStorage mocks base method.
@@ -133,58 +133,30 @@ func (mr *MockStorageMockRecorder) GetData() *gomock.Call {
 }
 
 // ReadMetric mocks base method.
-func (m *MockStorage) ReadMetric(name string) (any, bool) {
+func (m *MockStorage) ReadMetric(mtype, name string) (any, bool) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ReadMetric", name)
+	ret := m.ctrl.Call(m, "ReadMetric", mtype, name)
 	ret0, _ := ret[0].(any)
 	ret1, _ := ret[1].(bool)
 	return ret0, ret1
 }
 
 // ReadMetric indicates an expected call of ReadMetric.
-func (mr *MockStorageMockRecorder) ReadMetric(name interface{}) *gomock.Call {
+func (mr *MockStorageMockRecorder) ReadMetric(mtype, name interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadMetric", reflect.TypeOf((*MockStorage)(nil).ReadMetric), name)
-}
-
-// RestoreFromDump mocks base method.
-func (m *MockStorage) RestoreFromDump() error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RestoreFromDump")
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// RestoreFromDump indicates an expected call of RestoreFromDump.
-func (mr *MockStorageMockRecorder) RestoreFromDump() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RestoreFromDump", reflect.TypeOf((*MockStorage)(nil).RestoreFromDump))
-}
-
-// RunStorageDumper mocks base method.
-func (m *MockStorage) RunStorageDumper() <-chan error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RunStorageDumper")
-	ret0, _ := ret[0].(<-chan error)
-	return ret0
-}
-
-// RunStorageDumper indicates an expected call of RunStorageDumper.
-func (mr *MockStorageMockRecorder) RunStorageDumper() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunStorageDumper", reflect.TypeOf((*MockStorage)(nil).RunStorageDumper))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadMetric", reflect.TypeOf((*MockStorage)(nil).ReadMetric), mtype, name)
 }
 
 // WriteMetric mocks base method.
-func (m *MockStorage) WriteMetric(name string, value any) error {
+func (m *MockStorage) WriteMetric(mtype, name string, value any) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WriteMetric", name, value)
+	ret := m.ctrl.Call(m, "WriteMetric", mtype, name, value)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // WriteMetric indicates an expected call of WriteMetric.
-func (mr *MockStorageMockRecorder) WriteMetric(name, value interface{}) *gomock.Call {
+func (mr *MockStorageMockRecorder) WriteMetric(mtype, name, value interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteMetric", reflect.TypeOf((*MockStorage)(nil).WriteMetric), name, value)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteMetric", reflect.TypeOf((*MockStorage)(nil).WriteMetric), mtype, name, value)
 }

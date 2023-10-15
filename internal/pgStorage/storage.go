@@ -34,12 +34,20 @@ func (s *storage) CheckConnection(ctx context.Context) error {
 }
 
 func (s *storage) Init(ctx context.Context) error {
-	_, err := s.db.QueryContext(ctx, "CREATE TABLE IF NOT EXISTS gauge(name text UNIQUE, value double precision);")
+	res, err := s.db.QueryContext(ctx, "CREATE TABLE IF NOT EXISTS gauge(name text UNIQUE, value double precision);")
+	if err != nil {
+		return err
+	}
+	err = res.Err()
 	if err != nil {
 		return err
 	}
 
-	_, err = s.db.QueryContext(ctx, "CREATE TABLE IF NOT EXISTS counter(name text UNIQUE, value bigint);")
+	res, err = s.db.QueryContext(ctx, "CREATE TABLE IF NOT EXISTS counter(name text UNIQUE, value bigint);")
+	if err != nil {
+		return err
+	}
+	err = res.Err()
 	if err != nil {
 		return err
 	}
@@ -53,8 +61,11 @@ func (s *storage) WriteMetric(mtype string, name string, value any) error {
 	qs := fmt.Sprintf("INSERT INTO %s VALUES ('%s', %v) ON CONFLICT (name) DO UPDATE SET value=%v", mtype, name, value, value)
 	//qs := fmt.Sprintf("INSERT INTO %s (name, value) VALUES ('%s', %v)", mtype, name, value)
 	//fmt.Printf("\nQUERY STRING %s \n", qs)
-	//_, err := s.db.Query(qs)
-	_, err := s.db.Query(qs)
+	res, err := s.db.Query(qs)
+	if err != nil {
+		return fmt.Errorf("cannot write %s:%v db error %w", name, value, err)
+	}
+	err = res.Err()
 	if err != nil {
 		return fmt.Errorf("cannot write %s:%v db error %w", name, value, err)
 	}
@@ -96,6 +107,11 @@ func (s *storage) GetData() (*metricscollector.StorageData, error) {
 		}
 
 		data[name] = value
+	}
+
+	err = rows.Err()
+	if err != nil {
+		return nil, err
 	}
 
 	return &data, nil
