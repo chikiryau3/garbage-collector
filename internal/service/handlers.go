@@ -1,6 +1,8 @@
 package service
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	metricscollector "github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	"github.com/go-chi/chi/v5"
@@ -176,13 +178,29 @@ func (s *service) GetMetric(w http.ResponseWriter, r *http.Request) {
 
 func (s *service) BatchUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	var batch []metricscollector.Metrics
-	if err := ReadJSONBody(r.Body, &batch); err != nil {
-		s.log.Error("UpdateHandler body parsing error", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+
+	var buf bytes.Buffer
+	_, err := buf.ReadFrom(r.Body)
+
+	if err != nil {
+		s.log.Error(fmt.Errorf("read request body error %w", err))
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	err := s.collector.SetBatch(batch)
+	if err = json.Unmarshal(buf.Bytes(), &batch); err != nil {
+		s.log.Error(fmt.Errorf("request body json error %w", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	//
+	//if err := ReadJSONBody(r.Body, &batch); err != nil {
+	//	s.log.Error("UpdateHandler body parsing error", err)
+	//	http.Error(w, err.Error(), http.StatusBadRequest)
+	//	return
+	//}
+
+	err = s.collector.SetBatch(batch)
 	if err != nil {
 		s.log.Error("BatchUpdateHandler error", err)
 		w.WriteHeader(http.StatusInternalServerError)
