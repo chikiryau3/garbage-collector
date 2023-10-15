@@ -64,6 +64,20 @@ func (mr *MetricsCollectorMockMockRecorder) ReadStorage() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadStorage", reflect.TypeOf((*MetricsCollectorMock)(nil).ReadStorage))
 }
 
+// SetBatch mocks base method.
+func (m *MetricsCollectorMock) SetBatch(batch []metricscollector.Metrics) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetBatch", batch)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetBatch indicates an expected call of SetBatch.
+func (mr *MetricsCollectorMockMockRecorder) SetBatch(batch interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetBatch", reflect.TypeOf((*MetricsCollectorMock)(nil).SetBatch), batch)
+}
+
 // SetCount mocks base method.
 func (m *MetricsCollectorMock) SetCount(name string, value int64) (int64, error) {
 	m.ctrl.T.Helper()

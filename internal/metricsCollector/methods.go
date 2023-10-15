@@ -58,7 +58,7 @@ func (c *metricsCollector) GetMetric(mtype string, name string) (any, error) {
 func (c *metricsCollector) SetBatch(batch []Metrics) error {
 	//var counters []service.Metrics
 	//var gauges []service.Metrics
-	var errs []error
+	//var errs []error
 
 	//counters := ``
 	//gauges := ``
@@ -67,7 +67,8 @@ func (c *metricsCollector) SetBatch(batch []Metrics) error {
 		case `counter`:
 			updatedValue, err := c.SetCount(mdata.ID, *mdata.Delta)
 			if err != nil {
-				errs = append(errs, fmt.Errorf("cannot write gauge metric %w", err))
+				fmt.Printf("%e", fmt.Errorf("cannot write gauge metric %w", err))
+				//errs = append(errs, fmt.Errorf("cannot write gauge metric %w", err))
 			}
 			mdata.Delta = &updatedValue
 			//counters += `(` + mdata.ID + `)`
@@ -76,7 +77,8 @@ func (c *metricsCollector) SetBatch(batch []Metrics) error {
 		case `gauge`:
 			updatedValue, err := c.SetGauge(mdata.ID, *mdata.Value)
 			if err != nil {
-				errs = append(errs, fmt.Errorf("cannot write gauge metric %w", err))
+				fmt.Printf("%e", fmt.Errorf("cannot write gauge metric %w", err))
+				//errs = append(errs, fmt.Errorf("cannot write gauge metric %w", err))
 			}
 			mdata.Value = &updatedValue
 			//gauges = append(gauges, mdata)
