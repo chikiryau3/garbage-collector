@@ -2,7 +2,6 @@ package metricscollector
 
 import (
 	"fmt"
-	"github.com/chikiryau3/garbage-collector/internal/service"
 )
 
 func (c *metricsCollector) SetGauge(name string, value float64) (float64, error) {
@@ -56,7 +55,7 @@ func (c *metricsCollector) GetMetric(mtype string, name string) (any, error) {
 //	return nil, nil
 //}
 
-func (c *metricsCollector) SetBatch(batch []service.Metrics) error {
+func (c *metricsCollector) SetBatch(batch []Metrics) error {
 	//var counters []service.Metrics
 	//var gauges []service.Metrics
 	var errs []error

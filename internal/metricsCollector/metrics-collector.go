@@ -1,7 +1,5 @@
 package metricscollector
 
-import "github.com/chikiryau3/garbage-collector/internal/service"
-
 // MetricsCollector интерфейс, содержащий бизнес-логику нашего сервиса
 // это пока выглядит как прокси к стораджу (но все же логика формирования данных к самому стораджу отношения не имеет)
 // когда будет БД, станет понятно зачем эта штука
@@ -15,9 +13,15 @@ type MetricsCollector interface {
 	ReadStorage() (*StorageData, error)
 	GetMetric(mtype string, name string) (any, error)
 
-	SetBatch(batch []service.Metrics) error
+	SetBatch(batch []Metrics) error
 }
 
+type Metrics struct {
+	ID    string   `json:"id"`              // имя метрики
+	MType string   `json:"type"`            // параметр, принимающий значение gauge или counter
+	Delta *int64   `json:"delta,omitempty"` // значение метрики в случае передачи counter
+	Value *float64 `json:"value,omitempty"` // значение метрики в случае передачи gauge
+}
 type StorageData map[string]any
 
 // UPD: перенес объявление интерфейса в коллектор, тк он общий для разных storage

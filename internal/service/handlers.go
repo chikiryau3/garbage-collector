@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	metricscollector "github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	"github.com/go-chi/chi/v5"
 	"net/http"
 	"strconv"
@@ -174,7 +175,7 @@ func (s *service) GetMetric(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *service) BatchUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	var batch []Metrics
+	var batch []metricscollector.Metrics
 	if err := ReadJSONBody(r.Body, &batch); err != nil {
 		s.log.Error("UpdateHandler body parsing error", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
