@@ -16,7 +16,7 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	metricValue, err := s.collector.GetMetric(mdata.ID)
+	metricValue, err := s.collector.GetMetric(mdata.MType, mdata.ID)
 	if err != nil {
 		s.log.Error("ValueHandler get metric error", err)
 		w.WriteHeader(http.StatusNotFound)
@@ -155,7 +155,7 @@ func (s *service) GaugeHandler(w http.ResponseWriter, r *http.Request) {
 func (s *service) GetMetric(w http.ResponseWriter, r *http.Request) {
 	mdata := extractMetricsData(r)
 
-	val, err := s.collector.GetMetric(mdata.name)
+	val, err := s.collector.GetMetric(mdata.mtype, mdata.name)
 	if err != nil {
 		s.log.Error("GetMetric error", err)
 		w.WriteHeader(http.StatusNotFound)

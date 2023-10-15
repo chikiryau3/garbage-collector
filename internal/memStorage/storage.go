@@ -12,7 +12,12 @@ import (
 // сейчас это просто мапа в памяти, но когда-нибудь это станет базой
 // в таком случае, можно будет реализовать этот же интерфейс, но с логикой для работы с БД
 // поэтому это именно интерфейс (ну и чтобы замокать)
-type MemStorage metricscollector.Storage
+type MemStorage interface {
+	metricscollector.Storage
+
+	RunStorageDumper() <-chan error
+	RestoreFromDump() error
+}
 
 type Config struct {
 	FileStoragePath string
@@ -45,7 +50,7 @@ func appendDataToFile(path string, data []byte) error {
 	return nil
 }
 
-func (s *storage) WriteMetric(name string, value any) error {
+func (s *storage) WriteMetric(_ string, name string, value any) error {
 	s.Lock()
 	defer s.Unlock()
 	s.data[name] = value
@@ -60,7 +65,7 @@ func (s *storage) WriteMetric(name string, value any) error {
 	return nil
 }
 
-func (s *storage) ReadMetric(name string) (any, bool) {
+func (s *storage) ReadMetric(_ string, name string) (any, bool) {
 	s.Lock()
 	defer s.Unlock()
 	value, ok := s.data[name]

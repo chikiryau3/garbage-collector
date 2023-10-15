@@ -11,7 +11,7 @@ type MetricsCollector interface {
 	SetCount(name string, value int64) (int64, error)
 
 	ReadStorage() (*StorageData, error)
-	GetMetric(name string) (any, error)
+	GetMetric(mtype string, name string) (any, error)
 }
 
 type StorageData map[string]any
@@ -19,12 +19,9 @@ type StorageData map[string]any
 // UPD: перенес объявление интерфейса в коллектор, тк он общий для разных storage
 
 type Storage interface {
-	WriteMetric(name string, value any) error
-	ReadMetric(name string) (any, bool)
+	WriteMetric(mtype string, name string, value any) error
+	ReadMetric(mtype string, name string) (any, bool)
 	GetData() (*StorageData, error)
-
-	RunStorageDumper() <-chan error
-	RestoreFromDump() error
 }
 
 type metricsCollector struct {
