@@ -2,46 +2,15 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"github.com/chikiryau3/garbage-collector/internal/configs"
 	"github.com/chikiryau3/garbage-collector/internal/logger"
-	"github.com/chikiryau3/garbage-collector/internal/memStorage"
 	"github.com/chikiryau3/garbage-collector/internal/metricsCollector"
-	"github.com/chikiryau3/garbage-collector/internal/pgStorage"
 	service2 "github.com/chikiryau3/garbage-collector/internal/service"
 	"github.com/chikiryau3/garbage-collector/internal/utils"
 	"github.com/go-chi/chi/v5"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"net/http"
 )
-
-func InitMemStorage(config *configs.ServiceConfig, log logger.Logger) metricscollector.Storage {
-	storage := memstorage.New(config.StorageConfig)
-
-	if config.Restore {
-		err := storage.RestoreFromDump()
-		if err != nil {
-			log.Error("restore from dump error", err)
-		}
-	}
-
-	if config.FileStoragePath != "" {
-		errs := storage.RunStorageDumper()
-		go utils.ListenForErrors(errs, "storage dumper error", log.Error)
-	}
-
-	return storage
-}
-
-func InitPgStorage(ctx context.Context, db *sql.DB) (pgstorage.PgStorage, error) {
-	s := pgstorage.New(db, &pgstorage.Config{})
-	err := s.Init(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return s, nil
-}
 
 func main() {
 	ctx := context.Background()
@@ -60,9 +29,9 @@ func main() {
 
 	var storage metricscollector.Storage
 	if config.DatabaseDSN == "" {
-		storage = InitMemStorage(config, log)
+		storage = utils.InitMemStorage(config, log)
 	} else {
-		storage, err = InitPgStorage(ctx, db)
+		storage, err = utils.InitPgStorage(ctx, db)
 		if err != nil {
 			panic(err)
 		}
