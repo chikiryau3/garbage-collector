@@ -55,7 +55,7 @@ func (c *metricsCollector) GetMetric(mtype string, name string) (any, error) {
 //	return nil, nil
 //}
 
-func (c *metricsCollector) SetBatch(batch []Metrics) error {
+func (c *metricsCollector) SetBatch(batch []Metrics) (*[]Metrics, error) {
 	//var counters []service.Metrics
 	//var gauges []service.Metrics
 	//var errs []error
@@ -88,5 +88,5 @@ func (c *metricsCollector) SetBatch(batch []Metrics) error {
 		}
 	}
 
-	return nil
+	return &batch, nil
 }

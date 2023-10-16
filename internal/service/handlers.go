@@ -202,7 +202,7 @@ func (s *service) BatchUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	//	return
 	//}
 
-	err = s.collector.SetBatch(batch)
+	updated, err := s.collector.SetBatch(batch)
 	s.log.Infoln("206")
 	if err != nil {
 		s.log.Error("BatchUpdateHandler error", err)
@@ -213,7 +213,7 @@ func (s *service) BatchUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-type", "application/json")
 	s.log.Infoln("215")
-	err = WriteJSONBody(w, batch)
+	err = WriteJSONBody(w, updated)
 	s.log.Infoln("217")
 	if err != nil {
 		s.log.Error("UpdateHandler response writing error", err)
