@@ -176,32 +176,27 @@ func (s *service) GetMetric(w http.ResponseWriter, r *http.Request) {
 
 func (s *service) BatchUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	var batch []metricscollector.Metrics
-	s.log.Infoln("1")
 	if err := ReadJSONBody(r.Body, &batch); err != nil {
 		s.log.Error("UpdateHandler body parsing error", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	updated, err := s.collector.SetBatch(batch)
-	s.log.Infoln("2")
+	_, err := s.collector.SetBatch(batch)
 	if err != nil {
 		s.log.Error("BatchUpdateHandler error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	s.log.Infoln("3")
 
 	w.Header().Set("Content-type", "application/json")
-	s.log.Infoln("4")
-	err = WriteJSONBody(w, updated)
-	s.log.Infoln("5")
+
+	// https://app.pachca.com/chats?thread_id=2125719
+	err = WriteJSONBody(w, &struct{}{})
 	if err != nil {
 		s.log.Error("UpdateHandler response writing error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	s.log.Infoln("6")
 	//w.WriteHeader(http.StatusOK)
-	s.log.Infoln("7")
 }

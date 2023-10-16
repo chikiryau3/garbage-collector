@@ -29,8 +29,6 @@ func WriteJSONBody(w http.ResponseWriter, data interface{}) error {
 		return fmt.Errorf("response body json error %w", err)
 	}
 
-	fmt.Printf("\n RESP JSON %s \n", resp)
-
 	_, err = w.Write(resp)
 	if err != nil {
 		return fmt.Errorf("response body write error %w", err)
