@@ -178,21 +178,23 @@ func (s *service) GetMetric(w http.ResponseWriter, r *http.Request) {
 
 func (s *service) BatchUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	var batch []metricscollector.Metrics
-
+	s.log.Infoln("181")
 	var buf bytes.Buffer
 	_, err := buf.ReadFrom(r.Body)
+	s.log.Infoln("184")
 
 	if err != nil {
 		s.log.Error(fmt.Errorf("read request body error %w", err))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
+	s.log.Infoln("191")
 	if err = json.Unmarshal(buf.Bytes(), &batch); err != nil {
 		s.log.Error(fmt.Errorf("request body json error %w", err))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	s.log.Infoln("197")
 	//
 	//if err := ReadJSONBody(r.Body, &batch); err != nil {
 	//	s.log.Error("UpdateHandler body parsing error", err)
@@ -201,19 +203,24 @@ func (s *service) BatchUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	//}
 
 	err = s.collector.SetBatch(batch)
+	s.log.Infoln("206")
 	if err != nil {
 		s.log.Error("BatchUpdateHandler error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	s.log.Infoln("212")
 
 	w.Header().Set("Content-type", "application/json")
+	s.log.Infoln("215")
 	err = WriteJSONBody(w, batch)
+	s.log.Infoln("217")
 	if err != nil {
 		s.log.Error("UpdateHandler response writing error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
+	s.log.Infoln("223")
 	w.WriteHeader(http.StatusOK)
+	s.log.Infoln("225")
 }
