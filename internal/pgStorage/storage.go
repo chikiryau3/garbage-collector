@@ -102,7 +102,7 @@ func (s *storage) ReadMetric(mtype string, name string) (any, bool) {
 	}
 
 	var value any
-	err := row.Scan(&value)
+	err = row.Scan(&value)
 	if err != nil {
 		fmt.Print(fmt.Errorf("ERROR PG SCAN %e", err))
 		return nil, false
