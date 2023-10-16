@@ -82,4 +82,4 @@ POST /updates/
 Host: localhost:8080
 Content-Type: application/json
 
-[{"id": "alloc", "type": "gauge", "value": 123}, {"id": "randomValue", "type": "counter", "delta": "sdf"}]
+[{"id":"CounterBatchZip50","type":"counter","delta":43997932},{"id":"GaugeBatchZip56","type":"gauge","value":567794.3424126297},{"id":"CounterBatchZip50","type":"counter","delta":1539066602},{"id":"GaugeBatchZip56","type":"gauge","value":449298.57970605826}]
