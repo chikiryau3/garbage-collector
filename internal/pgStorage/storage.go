@@ -91,6 +91,8 @@ func (s *storage) ReadMetric(mtype string, name string) (any, bool) {
 	fmt.Printf("MTTYPE %s \n", mtype)
 	fmt.Printf("NAME %s \n", name)
 	qs := fmt.Sprintf("SELECT * FROM %s WHERE name=%s", mtype, name)
+	fmt.Printf("QUERY %s \n", qs)
+
 	row := s.db.QueryRow(qs)
 	if err := row.Err(); err != nil {
 		fmt.Print(fmt.Errorf("ERROR PG %e", err))
