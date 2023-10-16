@@ -88,6 +88,7 @@ func (s *storage) WriteMetrics(mtype string, name string, value any) error {
 // TODO: return error instead of OK bool
 
 func (s *storage) ReadMetric(mtype string, name string) (any, bool) {
+	fmt.Printf("MTTYPE %s \n", mtype)
 	row := s.db.QueryRow("SELECT * FROM $1 WHERE name=$2", mtype, name)
 	if err := row.Err(); err != nil {
 		fmt.Print(fmt.Errorf("\n ERROR PG %e\n", err))
