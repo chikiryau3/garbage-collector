@@ -1,8 +1,6 @@
 package service
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	metricscollector "github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	"github.com/go-chi/chi/v5"
@@ -178,49 +176,32 @@ func (s *service) GetMetric(w http.ResponseWriter, r *http.Request) {
 
 func (s *service) BatchUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	var batch []metricscollector.Metrics
-	s.log.Infoln("181")
-	var buf bytes.Buffer
-	_, err := buf.ReadFrom(r.Body)
-	s.log.Infoln("184")
-
-	if err != nil {
-		s.log.Error(fmt.Errorf("read request body error %w", err))
-		w.WriteHeader(http.StatusInternalServerError)
+	s.log.Infoln("1")
+	if err := ReadJSONBody(r.Body, &batch); err != nil {
+		s.log.Error("UpdateHandler body parsing error", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	s.log.Infoln("191")
-	if err = json.Unmarshal(buf.Bytes(), &batch); err != nil {
-		s.log.Error(fmt.Errorf("request body json error %w", err))
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	s.log.Infoln("197")
-	//
-	//if err := ReadJSONBody(r.Body, &batch); err != nil {
-	//	s.log.Error("UpdateHandler body parsing error", err)
-	//	http.Error(w, err.Error(), http.StatusBadRequest)
-	//	return
-	//}
 
 	updated, err := s.collector.SetBatch(batch)
-	s.log.Infoln("206")
+	s.log.Infoln("2")
 	if err != nil {
 		s.log.Error("BatchUpdateHandler error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	s.log.Infoln("212")
+	s.log.Infoln("3")
 
 	w.Header().Set("Content-type", "application/json")
-	s.log.Infoln("215")
+	s.log.Infoln("4")
 	err = WriteJSONBody(w, updated)
-	s.log.Infoln("217")
+	s.log.Infoln("5")
 	if err != nil {
 		s.log.Error("UpdateHandler response writing error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	s.log.Infoln("223")
+	s.log.Infoln("6")
 	w.WriteHeader(http.StatusOK)
-	s.log.Infoln("225")
+	s.log.Infoln("7")
 }

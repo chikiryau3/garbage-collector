@@ -13,7 +13,7 @@ type MetricsCollector interface {
 	ReadStorage() (*StorageData, error)
 	GetMetric(mtype string, name string) (any, error)
 
-	SetBatch(batch []Metrics) ([]Metrics, error)
+	SetBatch(batch []Metrics) (*[]Metrics, error)
 }
 
 type Metrics struct {
