@@ -65,11 +65,12 @@ func (mr *MetricsCollectorMockMockRecorder) ReadStorage() *gomock.Call {
 }
 
 // SetBatch mocks base method.
-func (m *MetricsCollectorMock) SetBatch(batch []metricscollector.Metrics) error {
+func (m *MetricsCollectorMock) SetBatch(batch []metricscollector.Metrics) (*[]metricscollector.Metrics, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetBatch", batch)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(*[]metricscollector.Metrics)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // SetBatch indicates an expected call of SetBatch.
