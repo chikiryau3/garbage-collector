@@ -87,6 +87,6 @@ func (c *metricsCollector) SetBatch(batch []Metrics) (*[]Metrics, error) {
 			//gauges[mdata.ID] = *mdata.Value
 		}
 	}
-
+	fmt.Printf("\n \n BATCH UPDATED %#v \n", batch)
 	return &batch, nil
 }
