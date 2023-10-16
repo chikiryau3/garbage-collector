@@ -202,6 +202,6 @@ func (s *service) BatchUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.log.Infoln("6")
-	w.WriteHeader(http.StatusOK)
+	//w.WriteHeader(http.StatusOK)
 	s.log.Infoln("7")
 }
