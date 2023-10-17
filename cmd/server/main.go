@@ -7,7 +7,6 @@ import (
 	"github.com/chikiryau3/garbage-collector/internal/logger"
 	"github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	service2 "github.com/chikiryau3/garbage-collector/internal/service"
-	"github.com/chikiryau3/garbage-collector/internal/utils"
 	"github.com/go-chi/chi/v5"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"net/http"
@@ -32,7 +31,7 @@ func main() {
 	if config.DatabaseDSN == "" {
 		storage = common.InitMemStorage(config, log)
 	} else {
-		storage, err = utils.InitPgStorage(ctx, db)
+		storage, err = common.InitPgStorage(ctx, db)
 		if err != nil {
 			panic(err)
 		}

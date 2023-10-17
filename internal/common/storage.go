@@ -1,11 +1,13 @@
 package common
 
 import (
+	"context"
 	"database/sql"
 	"github.com/chikiryau3/garbage-collector/internal/configs"
 	"github.com/chikiryau3/garbage-collector/internal/logger"
 	memstorage "github.com/chikiryau3/garbage-collector/internal/memStorage"
 	metricscollector "github.com/chikiryau3/garbage-collector/internal/metricsCollector"
+	pgstorage "github.com/chikiryau3/garbage-collector/internal/pgStorage"
 	"github.com/chikiryau3/garbage-collector/internal/utils"
 )
 
@@ -35,4 +37,14 @@ func InitPgConnection(conString string) (*sql.DB, error) {
 	}
 
 	return db, nil
+}
+
+func InitPgStorage(ctx context.Context, db *sql.DB) (pgstorage.PgStorage, error) {
+	s := pgstorage.New(db, &pgstorage.Config{})
+	err := s.Init(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return s, nil
 }
