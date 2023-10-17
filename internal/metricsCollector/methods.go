@@ -61,37 +61,25 @@ func (c *metricsCollector) GetMetric(mtype string, name string) (any, error) {
 	return metricValue, nil
 }
 
-//type count map[string]int64
-//type gauge map[string]float64
-//
-//func (c *metricsCollector) writeGaugeBatch(batch []service.Metrics) ([]service.Metrics, error) {
-//	for _, mdata := range batch {
-//
-//	}
-//	return nil, nil
-//}
-
 func (c *metricsCollector) SetBatch(batch []Metrics) (*[]Metrics, error) {
-	//var errs []error
-
+	var errs error
 	for _, mdata := range batch {
 		switch mdata.MType {
 		case `counter`:
 			updatedValue, err := c.SetCount(mdata.ID, *mdata.Delta)
 			if err != nil {
-				fmt.Printf("%e", fmt.Errorf("cannot write gauge metric %w", err))
-				//errs = append(errs, fmt.Errorf("cannot write gauge metric %w", err))
+				_ = errors.Join(errs, fmt.Errorf("cannot write counter metric %w", err))
 			}
 			mdata.Delta = &updatedValue
 		case `gauge`:
 			updatedValue, err := c.SetGauge(mdata.ID, *mdata.Value)
 			if err != nil {
 				fmt.Printf("%e", fmt.Errorf("cannot write gauge metric %w", err))
-				//errs = append(errs, fmt.Errorf("cannot write gauge metric %w", err))
+				_ = errors.Join(errs, fmt.Errorf("cannot write gauge metric %w", err))
 			}
 			mdata.Value = &updatedValue
 		}
 	}
 
-	return &batch, nil
+	return &batch, errs
 }
