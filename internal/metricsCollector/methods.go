@@ -74,7 +74,6 @@ func (c *metricsCollector) SetBatch(batch []Metrics) (*[]Metrics, error) {
 		case `gauge`:
 			updatedValue, err := c.SetGauge(mdata.ID, *mdata.Value)
 			if err != nil {
-				fmt.Printf("%e", fmt.Errorf("cannot write gauge metric %w", err))
 				_ = errors.Join(errs, fmt.Errorf("cannot write gauge metric %w", err))
 			}
 			mdata.Value = &updatedValue
