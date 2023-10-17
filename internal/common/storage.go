@@ -36,7 +36,7 @@ func InitPgConnection(conString string) (*sql.DB, error) {
 		return nil, err
 	}
 
-	db.SetMaxOpenConns(20)
+	db.SetMaxOpenConns(100)
 
 	return db, nil
 }
