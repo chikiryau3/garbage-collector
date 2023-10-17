@@ -70,9 +70,8 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 	req.Header.Add("Content-encoding", "gzip")
 	req.Header.Add("Accept-encoding", "gzip")
 
-	var res *http.Response
-	retriable := func() error {
-		res, err = http.DefaultClient.Do(req)
+	retryable := func() error {
+		res, err := http.DefaultClient.Do(req)
 		if err != nil {
 			return err
 		}
@@ -84,7 +83,7 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 
 		return nil
 	}
-	err = backoff.Retry(retriable, c.retry)
+	err = backoff.Retry(retryable, c.retry)
 
 	if err != nil {
 		fmt.Println(fmt.Errorf("do request err %w", err))
@@ -126,9 +125,8 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 	req.Header.Add("Content-encoding", "gzip")
 	req.Header.Add("Accept-encoding", "gzip")
 
-	var res *http.Response
-	retriable := func() error {
-		res, err = http.DefaultClient.Do(req)
+	retryable := func() error {
+		res, err := http.DefaultClient.Do(req)
 		if err != nil {
 			return err
 		}
@@ -140,7 +138,7 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 
 		return nil
 	}
-	err = backoff.Retry(retriable, c.retry)
+	err = backoff.Retry(retryable, c.retry)
 
 	if err != nil {
 		fmt.Println(fmt.Errorf("do request err %w", err))
