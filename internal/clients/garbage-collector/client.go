@@ -73,14 +73,9 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 	var res *http.Response
 	retriable := func() error {
 		res, err = http.DefaultClient.Do(req)
+		defer res.Body.Close()
 		if err != nil {
 			return err
-		}
-
-		err = res.Body.Close()
-
-		if err != nil {
-			return fmt.Errorf("body close err %w", err)
 		}
 
 		return nil
@@ -130,6 +125,8 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 	var res *http.Response
 	retriable := func() error {
 		res, err = http.DefaultClient.Do(req)
+		defer res.Body.Close()
+
 		if err != nil {
 			return err
 		}

@@ -35,8 +35,8 @@ func Test_agent_pollMetrics(t *testing.T) {
 			expectationsFn: func() {
 				// много gauge из runtime
 				collectorMock.EXPECT().SetGauge(gomock.Any(), gomock.Any()).AnyTimes()
-				// 2 count
-				collectorMock.EXPECT().SetCount(gomock.Any(), gomock.Any()).Times(2)
+				// 1 count
+				collectorMock.EXPECT().SetCount(gomock.Any(), gomock.Any()).Times(1)
 			},
 		},
 	}
