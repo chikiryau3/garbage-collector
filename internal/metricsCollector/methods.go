@@ -69,12 +69,14 @@ func (c *metricsCollector) SetBatch(batch []Metrics) (*[]Metrics, error) {
 			updatedValue, err := c.SetCount(mdata.ID, *mdata.Delta)
 			if err != nil {
 				_ = errors.Join(errs, fmt.Errorf("cannot write counter metric %w", err))
+				continue
 			}
 			mdata.Delta = &updatedValue
 		case `gauge`:
 			updatedValue, err := c.SetGauge(mdata.ID, *mdata.Value)
 			if err != nil {
 				_ = errors.Join(errs, fmt.Errorf("cannot write gauge metric %w", err))
+				continue
 			}
 			mdata.Value = &updatedValue
 		}
