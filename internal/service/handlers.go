@@ -21,7 +21,7 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 
 	metricValue, err := s.collector.GetMetric(mdata.MType, mdata.ID)
 	if err != nil {
-		s.log.Error("ValueHandler get metric error", err)
+		//s.log.Error("ValueHandler get metric error", err)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
