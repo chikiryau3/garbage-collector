@@ -45,11 +45,11 @@ func (c *metricsCollector) GetMetric(mtype string, name string) (any, error) {
 	retriable := func() error {
 		metricValue, err = c.storage.ReadMetric(mtype, name)
 		var sErr *StorageRetryableError
-		if !errors.As(err, &sErr) {
-			return backoff.Permanent(err)
+		if errors.As(err, &sErr) {
+			return err
 		}
 
-		return err
+		return backoff.Permanent(err)
 	}
 
 	err = backoff.Retry(retriable, c.retry)
