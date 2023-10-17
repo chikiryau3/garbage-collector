@@ -77,6 +77,12 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 			return err
 		}
 
+		err = res.Body.Close()
+
+		if err != nil {
+			return fmt.Errorf("body close err %w", err)
+		}
+
 		return nil
 	}
 	err = backoff.Retry(retriable, c.retry)
@@ -84,12 +90,6 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 	if err != nil {
 		fmt.Println(fmt.Errorf("do request err %w", err))
 		return nil
-	}
-
-	err = res.Body.Close()
-
-	if err != nil {
-		return fmt.Errorf("body close err %w", err)
 	}
 
 	return nil
@@ -134,6 +134,11 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 			return err
 		}
 
+		err = res.Body.Close()
+		if err != nil {
+			return fmt.Errorf("body close err %w", err)
+		}
+
 		return nil
 	}
 	err = backoff.Retry(retriable, c.retry)
@@ -141,11 +146,6 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 	if err != nil {
 		fmt.Println(fmt.Errorf("do request err %w", err))
 		return nil
-	}
-
-	err = res.Body.Close()
-	if err != nil {
-		return fmt.Errorf("body close err %w", err)
 	}
 
 	return nil

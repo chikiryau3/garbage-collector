@@ -1,5 +1,11 @@
 package metricscollector
 
+import (
+	"github.com/cenkalti/backoff"
+	"github.com/chikiryau3/garbage-collector/internal/utils"
+	"time"
+)
+
 // MetricsCollector интерфейс, содержащий бизнес-логику нашего сервиса
 // это пока выглядит как прокси к стораджу (но все же логика формирования данных к самому стораджу отношения не имеет)
 // когда будет БД, станет понятно зачем эта штука
@@ -28,16 +34,24 @@ type StorageData map[string]any
 
 type Storage interface {
 	WriteMetric(mtype string, name string, value any) error
-	ReadMetric(mtype string, name string) (any, bool)
+	ReadMetric(mtype string, name string) (any, error)
 	GetData() (*StorageData, error)
 }
 
 type metricsCollector struct {
 	storage Storage
+	retry   backoff.BackOff
 }
 
 func New(s Storage) MetricsCollector {
+	r := &utils.Retry{
+		InitInterval:  time.Second,
+		RetryTimeout:  time.Minute,
+		MaxRetryTimes: 3,
+	}
+
 	return &metricsCollector{
+		retry:   r.NewExponentialBackOff(),
 		storage: s,
 	}
 }

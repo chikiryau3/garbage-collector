@@ -40,12 +40,12 @@ func appendDataToFile(path string, data []byte) error {
 	}()
 
 	if err != nil {
-		return err
+		return NewMemStorageError(err)
 	}
 
 	_, err = file.Write(data)
 	if err != nil {
-		return err
+		return NewMemStorageError(err)
 	}
 
 	return nil
@@ -59,19 +59,22 @@ func (s *storage) WriteMetric(_ string, name string, value any) error {
 	if s.config.SyncStore {
 		err := appendDataToFile(s.config.FileStoragePath, []byte(fmt.Sprintf("\"%s\":\"%v\"", name, value)))
 		if err != nil {
-			return err
+			return NewMemStorageError(err)
 		}
 	}
 
 	return nil
 }
 
-func (s *storage) ReadMetric(_ string, name string) (any, bool) {
+func (s *storage) ReadMetric(_ string, name string) (any, error) {
 	s.Lock()
 	defer s.Unlock()
 	value, ok := s.data[name]
+	if !ok {
+		return nil, NewMemStorageError(fmt.Errorf("no such metric %s", name))
+	}
 
-	return value, ok
+	return value, nil
 }
 
 func (s *storage) GetData() (*metricscollector.StorageData, error) {

@@ -1,7 +1,9 @@
 package metricscollector
 
 import (
+	"errors"
 	"fmt"
+	"github.com/cenkalti/backoff"
 )
 
 func (c *metricsCollector) SetGauge(name string, value float64) (float64, error) {
@@ -23,7 +25,7 @@ func (c *metricsCollector) writeCount(name string, value int64) (int64, error) {
 }
 
 func (c *metricsCollector) SetCount(name string, value int64) (int64, error) {
-	if currentValueRaw, ok := c.storage.ReadMetric(`counter`, name); ok {
+	if currentValueRaw, err := c.storage.ReadMetric(`counter`, name); err != nil {
 		if currentValue, ok := currentValueRaw.(int64); ok {
 			return c.writeCount(name, value+currentValue)
 		}
@@ -37,9 +39,23 @@ func (c *metricsCollector) ReadStorage() (*StorageData, error) {
 }
 
 func (c *metricsCollector) GetMetric(mtype string, name string) (any, error) {
-	metricValue, ok := c.storage.ReadMetric(mtype, name)
-	if !ok {
-		return nil, fmt.Errorf("unkonwn metric %s", name)
+	var metricValue any
+	var err error
+
+	retriable := func() error {
+		metricValue, err = c.storage.ReadMetric(mtype, name)
+		var sErr *StorageRetryableError
+		if !errors.As(err, &sErr) {
+			return backoff.Permanent(err)
+		}
+
+		return err
+	}
+
+	err = backoff.Retry(retriable, c.retry)
+
+	if err != nil {
+		return nil, err
 	}
 
 	return metricValue, nil

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	metricscollector "github.com/chikiryau3/garbage-collector/internal/metricsCollector"
+	_ "github.com/jackc/pgerrcode"
 )
 
 type PgStorage interface {
@@ -36,20 +37,20 @@ func (s *storage) CheckConnection(ctx context.Context) error {
 func (s *storage) Init(ctx context.Context) error {
 	res, err := s.db.QueryContext(ctx, "CREATE TABLE IF NOT EXISTS gauge(name text UNIQUE, value double precision);")
 	if err != nil {
-		return err
+		return NewPgError(err)
 	}
 	err = res.Err()
 	if err != nil {
-		return err
+		return NewPgError(err)
 	}
 
 	res, err = s.db.QueryContext(ctx, "CREATE TABLE IF NOT EXISTS counter(name text UNIQUE, value bigint);")
 	if err != nil {
-		return err
+		return NewPgError(err)
 	}
 	err = res.Err()
 	if err != nil {
-		return err
+		return NewPgError(err)
 	}
 
 	return nil
@@ -60,11 +61,11 @@ func (s *storage) WriteMetric(mtype string, name string, value any) error {
 	qs := fmt.Sprintf("INSERT INTO %s VALUES ('%s', %v) ON CONFLICT (name) DO UPDATE SET value=%v", mtype, name, value, value)
 	res, err := s.db.Query(qs)
 	if err != nil {
-		return fmt.Errorf("cannot write %s:%v db error %w", name, value, err)
+		return fmt.Errorf("cannot write %s:%v db error %w", name, value, NewPgError(err))
 	}
 	err = res.Err()
 	if err != nil {
-		return fmt.Errorf("cannot write %s:%v db error %w", name, value, err)
+		return fmt.Errorf("cannot write %s:%v db error %w", name, value, NewPgError(err))
 	}
 
 	return nil
@@ -87,7 +88,7 @@ func (s *storage) WriteMetrics(mtype string, name string, value any) error {
 
 // TODO: return error instead of OK bool
 
-func (s *storage) ReadMetric(mtype string, name string) (any, bool) {
+func (s *storage) ReadMetric(mtype string, name string) (any, error) {
 	//data, err := s.GetData()
 	//fmt.Printf("STORAGE %#v \n", data)
 	//fmt.Printf("MTTYPE %s \n", mtype)
@@ -97,25 +98,23 @@ func (s *storage) ReadMetric(mtype string, name string) (any, bool) {
 
 	row := s.db.QueryRow(qs)
 	if err := row.Err(); err != nil {
-		fmt.Print(fmt.Errorf("ERROR PG %e", err))
-		return nil, false
+		return nil, NewPgError(err)
 	}
 
 	var mName string
 	var value any
 	err := row.Scan(&mName, &value)
 	if err != nil {
-		fmt.Print(fmt.Errorf("ERROR PG SCAN %e", err))
-		return nil, false
+		return nil, NewPgError(err)
 	}
 
-	return value, true
+	return value, nil
 }
 
 func (s *storage) GetData() (*metricscollector.StorageData, error) {
 	rows, err := s.db.Query("SELECT * FROM gauge, counter")
 	if err != nil {
-		return nil, err
+		return nil, NewPgError(err)
 	}
 	defer rows.Close()
 
@@ -125,7 +124,7 @@ func (s *storage) GetData() (*metricscollector.StorageData, error) {
 		var name string
 		var value any
 		if err := rows.Scan(&name, &value); err != nil {
-			return &data, err
+			return &data, NewPgError(err)
 		}
 
 		data[name] = value
@@ -133,7 +132,7 @@ func (s *storage) GetData() (*metricscollector.StorageData, error) {
 
 	err = rows.Err()
 	if err != nil {
-		return nil, err
+		return nil, NewPgError(err)
 	}
 
 	return &data, nil
