@@ -2,10 +2,8 @@ package memstorage
 
 import (
 	"fmt"
-	"github.com/chikiryau3/garbage-collector/internal/configs"
-	"github.com/chikiryau3/garbage-collector/internal/logger"
+
 	metricscollector "github.com/chikiryau3/garbage-collector/internal/metricsCollector"
-	"github.com/chikiryau3/garbage-collector/internal/utils"
 	"os"
 	"sync"
 	"time"
@@ -91,22 +89,4 @@ func New(c *Config) MemStorage {
 		data:   map[string]any{},
 		config: c,
 	}
-}
-
-func InitMemStorage(config *configs.ServiceConfig, log logger.Logger) metricscollector.Storage {
-	s := New(config.StorageConfig)
-
-	if config.Restore {
-		err := s.RestoreFromDump()
-		if err != nil {
-			log.Error("restore from dump error", err)
-		}
-	}
-
-	if config.FileStoragePath != "" {
-		errs := s.RunStorageDumper()
-		go utils.ListenForErrors(errs, "storage dumper error", log.Error)
-	}
-
-	return s
 }

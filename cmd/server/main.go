@@ -2,11 +2,10 @@ package main
 
 import (
 	"context"
+	"github.com/chikiryau3/garbage-collector/internal/common"
 	"github.com/chikiryau3/garbage-collector/internal/configs"
 	"github.com/chikiryau3/garbage-collector/internal/logger"
-	memstorage "github.com/chikiryau3/garbage-collector/internal/memStorage"
 	"github.com/chikiryau3/garbage-collector/internal/metricsCollector"
-	pgstorage "github.com/chikiryau3/garbage-collector/internal/pgStorage"
 	service2 "github.com/chikiryau3/garbage-collector/internal/service"
 	"github.com/chikiryau3/garbage-collector/internal/utils"
 	"github.com/go-chi/chi/v5"
@@ -23,7 +22,7 @@ func main() {
 
 	config := configs.LoadServiceConfig()
 
-	db, err := pgstorage.InitPgConnection(config.DatabaseDSN)
+	db, err := common.InitPgConnection(config.DatabaseDSN)
 	if err != nil {
 		panic(err)
 	}
@@ -31,7 +30,7 @@ func main() {
 
 	var storage metricscollector.Storage
 	if config.DatabaseDSN == "" {
-		storage = memstorage.InitMemStorage(config, log)
+		storage = common.InitMemStorage(config, log)
 	} else {
 		storage, err = utils.InitPgStorage(ctx, db)
 		if err != nil {
