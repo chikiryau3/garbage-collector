@@ -25,7 +25,7 @@ func (c *metricsCollector) writeCount(name string, value int64) (int64, error) {
 }
 
 func (c *metricsCollector) SetCount(name string, value int64) (int64, error) {
-	if currentValueRaw, err := c.storage.ReadMetric(`counter`, name); err != nil {
+	if currentValueRaw, err := c.storage.ReadMetric(`counter`, name); err == nil {
 		if currentValue, ok := currentValueRaw.(int64); ok {
 			return c.writeCount(name, value+currentValue)
 		}
