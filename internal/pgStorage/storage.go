@@ -43,6 +43,7 @@ func (s *storage) Init(ctx context.Context) error {
 	if err != nil {
 		return NewPgError(err)
 	}
+	res.Close()
 
 	res, err = s.db.QueryContext(ctx, "CREATE TABLE IF NOT EXISTS counter(name text UNIQUE, value bigint);")
 	if err != nil {
@@ -52,6 +53,7 @@ func (s *storage) Init(ctx context.Context) error {
 	if err != nil {
 		return NewPgError(err)
 	}
+	res.Close()
 
 	return nil
 }
@@ -67,6 +69,7 @@ func (s *storage) WriteMetric(mtype string, name string, value any) error {
 	if err != nil {
 		return fmt.Errorf("cannot write %s:%v db error %w", name, value, NewPgError(err))
 	}
+	res.Close()
 
 	return nil
 }
@@ -82,6 +85,7 @@ func (s *storage) WriteMetrics(mtype string, name string, value any) error {
 	if err != nil {
 		return fmt.Errorf("cannot write %s:%v db error %w", name, value, err)
 	}
+	res.Close()
 
 	return nil
 }
