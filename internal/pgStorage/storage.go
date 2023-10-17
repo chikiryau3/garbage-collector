@@ -29,6 +29,16 @@ func New(db *sql.DB, c *Config) PgStorage {
 	}
 }
 
+func InitPgConnection(conString string) (*sql.DB, error) {
+	db, err := sql.Open("pgx", conString)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return db, nil
+}
+
 func (s *storage) CheckConnection(ctx context.Context) error {
 	return s.db.PingContext(ctx)
 }
