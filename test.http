@@ -54,11 +54,11 @@ Content-Length: 0
 Content-Type: text/plain
 
 ###
-POST /value/
+POST /update/
 Host: localhost:8080
 Content-Type: application/json
 
-{"id": "alloc", "type": "gauge", "value": null}
+{"id": "randomValue", "type": "gauge", "value": 1234}
 
 ###
 POST /value/

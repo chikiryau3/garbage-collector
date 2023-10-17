@@ -65,7 +65,7 @@ func (a *agent) pollMetrics() error {
 	}
 
 	// сохраняю метрики с тегами чтобы можно было отправить все в цикле не разбирая каждую отдельно
-	_, err = a.collector.SetCount("count:RandomValue", rand.Int63())
+	_, err = a.collector.SetGauge("gauge:RandomValue", rand.Float64())
 	if err != nil {
 		return fmt.Errorf("set count error %w", err)
 	}
