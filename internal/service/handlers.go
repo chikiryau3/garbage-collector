@@ -17,8 +17,6 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.log.Infoln("\n MDATA \n", mdata, "\n")
-
 	metricValue, err := s.collector.GetMetric(mdata.MType, mdata.ID)
 	if err != nil {
 		//s.log.Error("ValueHandler get metric error", err)
@@ -200,5 +198,5 @@ func (s *service) BatchUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	//w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusOK)
 }
