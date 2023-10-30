@@ -7,6 +7,7 @@ import (
 	"github.com/chikiryau3/garbage-collector/internal/logger"
 	"github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	service2 "github.com/chikiryau3/garbage-collector/internal/service"
+	"github.com/chikiryau3/garbage-collector/internal/utils"
 	"github.com/go-chi/chi/v5"
 	_ "github.com/go-chi/chi/v5/middleware"
 	_ "github.com/jackc/pgx/v5/stdlib"
