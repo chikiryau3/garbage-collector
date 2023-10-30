@@ -62,8 +62,9 @@ func (sw *signWriter) WriteHeader(statusCode int) {
 
 func (s *service) WithSignCheck(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		s.log.Infoln("KEY MIDDLE", s.config.Key)
-		if s.config.Key == "" {
+		headerHash := r.Header.Get("HashSHA256")
+
+		if s.config.Key == "" || headerHash == "" {
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -80,9 +81,6 @@ func (s *service) WithSignCheck(next http.Handler) http.Handler {
 		hash.Write(body.Bytes())
 
 		rSign, _ := base64.URLEncoding.DecodeString(r.Header.Get("HashSHA256"))
-
-		s.log.Infoln("BODY", body.String(), "HEADER", r.Header.Get("HashSHA256"))
-		s.log.Infoln("BODY HASH", hash.Sum(nil), "HEADER HASH", rSign)
 
 		if !hmac.Equal(hash.Sum(nil), rSign) {
 			s.log.Error("invalid request signature")
