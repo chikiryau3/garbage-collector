@@ -91,17 +91,12 @@ func (s *storage) WriteMetrics(mtype string, name string, value any) error {
 }
 
 func (s *storage) ReadMetric(mtype string, name string) (any, error) {
-	qs := fmt.Sprintf("SELECT * FROM %s WHERE name='%s'", mtype, name)
-
-	row := s.db.QueryRow(qs)
-	if err := row.Err(); err != nil {
-		return nil, NewPgError(err)
-	}
-
 	var mName string
 	var value any
-	err := row.Scan(&mName, &value)
-	if err != nil {
+
+	qs := fmt.Sprintf("SELECT * FROM %s WHERE name='%s'", mtype, name)
+
+	if err := s.db.QueryRow(qs).Scan(&mName, &value); err != nil {
 		return nil, NewPgError(err)
 	}
 

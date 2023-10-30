@@ -182,7 +182,7 @@ func (s *service) BatchUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := s.collector.SetBatch(batch)
+	updatedBatch, err := s.collector.SetBatch(batch)
 	if err != nil {
 		s.log.Error("BatchUpdateHandler error", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -191,8 +191,7 @@ func (s *service) BatchUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-type", "application/json")
 
-	// https://app.pachca.com/chats?thread_id=2125719
-	err = WriteJSONBody(w, &struct{}{})
+	err = WriteJSONBody(w, updatedBatch)
 	if err != nil {
 		s.log.Error("UpdateHandler response writing error", err)
 		w.WriteHeader(http.StatusInternalServerError)
