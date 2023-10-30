@@ -35,6 +35,8 @@ func New(c *Config) Client {
 		MaxRetryTimes: 3,
 	}
 
+	fmt.Printf("GC CONFIG %#v\n", c)
+
 	return &client{
 		retry:  r.NewExponentialBackOff(),
 		config: c,

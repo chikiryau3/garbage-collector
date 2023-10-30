@@ -62,6 +62,7 @@ func (sw *signWriter) WriteHeader(statusCode int) {
 
 func (s *service) WithSignCheck(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		s.log.Infoln("KEY MIDDLE", s.config.Key)
 		if s.config.Key == "" {
 			next.ServeHTTP(w, r)
 			return
