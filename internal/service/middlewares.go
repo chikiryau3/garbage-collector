@@ -78,7 +78,9 @@ func (s *service) WithSignCheck(next http.Handler) http.Handler {
 
 		hash.Write(body.Bytes())
 
-		rSign, err := base64.URLEncoding.DecodeString(r.Header.Get("HashSHA256"))
+		rSign, _ := base64.URLEncoding.DecodeString(r.Header.Get("HashSHA256"))
+
+		s.log.Infoln("BODY HASH", hash.Sum(nil), "HEADER HASH", rSign)
 
 		if !hmac.Equal(hash.Sum(nil), rSign) {
 			s.log.Error("invalid request signature")
