@@ -14,6 +14,7 @@ type ServiceConfig struct {
 	Restore         bool
 	Endpoint        string
 	StorageConfig   *memstorage.Config
+	DatabaseDSN     string
 }
 
 type ServiceCLIArgs struct {
@@ -21,6 +22,7 @@ type ServiceCLIArgs struct {
 	fileStoragePath *string
 	restore         *bool
 	endpoint        *string
+	databaseDSN     *string
 }
 
 func LoadServiceConfig() *ServiceConfig {
@@ -29,6 +31,7 @@ func LoadServiceConfig() *ServiceConfig {
 		fileStoragePath: flag.String("f", "/tmp/metrics-db.json", "filePath"),
 		storeInterval:   flag.Int64("i", 300, "store interval (seconds)"),
 		restore:         flag.Bool("r", true, "should restore from file (bool)"),
+		databaseDSN:     flag.String("d", "", "databaseDSN connection string"),
 	}
 
 	flag.Parse()
@@ -62,6 +65,12 @@ func LoadServiceConfig() *ServiceConfig {
 		config.Restore = restore == `true`
 	} else {
 		config.Restore = *args.restore
+	}
+
+	if databaseDSN, ok := os.LookupEnv(`DATABASE_DSN`); ok {
+		config.DatabaseDSN = databaseDSN
+	} else {
+		config.DatabaseDSN = *args.databaseDSN
 	}
 
 	config.StorageConfig = &memstorage.Config{

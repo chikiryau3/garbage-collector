@@ -3,6 +3,7 @@ package memstorage
 import (
 	"encoding/json"
 	"fmt"
+	metricscollector "github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	"os"
 	"time"
 )
@@ -61,7 +62,7 @@ func (s *storage) RestoreFromDump() error {
 	s.Lock()
 	defer s.Unlock()
 
-	var storageData StorageData
+	var storageData metricscollector.StorageData
 	data, err := os.ReadFile(s.config.FileStoragePath)
 
 	if err != nil {

@@ -2,21 +2,19 @@ package memstorage
 
 import (
 	"fmt"
+
+	metricscollector "github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	"os"
 	"sync"
 	"time"
 )
-
-type StorageData map[string]any
 
 // MemStorage -- интерфейс для работы с хранилищем, "читать и писать"
 // сейчас это просто мапа в памяти, но когда-нибудь это станет базой
 // в таком случае, можно будет реализовать этот же интерфейс, но с логикой для работы с БД
 // поэтому это именно интерфейс (ну и чтобы замокать)
 type MemStorage interface {
-	WriteMetric(name string, value any) error
-	ReadMetric(name string) (any, bool)
-	GetData() (*StorageData, error)
+	metricscollector.Storage
 
 	RunStorageDumper() <-chan error
 	RestoreFromDump() error
@@ -29,7 +27,7 @@ type Config struct {
 }
 
 type storage struct {
-	data   StorageData
+	data   metricscollector.StorageData
 	config *Config
 	sync.Mutex
 }
@@ -42,18 +40,18 @@ func appendDataToFile(path string, data []byte) error {
 	}()
 
 	if err != nil {
-		return err
+		return NewMemStorageError(err)
 	}
 
 	_, err = file.Write(data)
 	if err != nil {
-		return err
+		return NewMemStorageError(err)
 	}
 
 	return nil
 }
 
-func (s *storage) WriteMetric(name string, value any) error {
+func (s *storage) WriteMetric(_ string, name string, value any) error {
 	s.Lock()
 	defer s.Unlock()
 	s.data[name] = value
@@ -61,22 +59,25 @@ func (s *storage) WriteMetric(name string, value any) error {
 	if s.config.SyncStore {
 		err := appendDataToFile(s.config.FileStoragePath, []byte(fmt.Sprintf("\"%s\":\"%v\"", name, value)))
 		if err != nil {
-			return err
+			return NewMemStorageError(err)
 		}
 	}
 
 	return nil
 }
 
-func (s *storage) ReadMetric(name string) (any, bool) {
+func (s *storage) ReadMetric(_ string, name string) (any, error) {
 	s.Lock()
 	defer s.Unlock()
 	value, ok := s.data[name]
+	if !ok {
+		return nil, NewMemStorageError(fmt.Errorf("no such metric %s", name))
+	}
 
-	return value, ok
+	return value, nil
 }
 
-func (s *storage) GetData() (*StorageData, error) {
+func (s *storage) GetData() (*metricscollector.StorageData, error) {
 	return &s.data, nil
 }
 

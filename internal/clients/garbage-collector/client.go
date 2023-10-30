@@ -5,8 +5,11 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
+	"github.com/cenkalti/backoff/v4"
 	"github.com/chikiryau3/garbage-collector/internal/service"
+	"github.com/chikiryau3/garbage-collector/internal/utils"
 	"net/http"
+	"time"
 )
 
 // Client -- клиент к сервису, контракты ручек, работа с хедерами, вот это все
@@ -17,10 +20,18 @@ type Client interface {
 
 type client struct {
 	serviceURL string
+	retry      backoff.BackOff
 }
 
 func New(serviceURL string) Client {
+	r := &utils.Retry{
+		InitInterval:  time.Second,
+		RetryTimeout:  time.Minute,
+		MaxRetryTimes: 3,
+	}
+
 	return &client{
+		retry:      r.NewExponentialBackOff(),
 		serviceURL: serviceURL,
 	}
 }
@@ -59,17 +70,24 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 	req.Header.Add("Content-encoding", "gzip")
 	req.Header.Add("Accept-encoding", "gzip")
 
-	// пока тело ответа нам не нужно
-	res, err := http.DefaultClient.Do(req)
+	retryable := func() error {
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return err
+		}
+
+		err = res.Body.Close()
+		if err != nil {
+			return fmt.Errorf("body close err %w", err)
+		}
+
+		return nil
+	}
+	err = backoff.Retry(retryable, c.retry)
+
 	if err != nil {
 		fmt.Println(fmt.Errorf("do request err %w", err))
 		return nil
-	}
-
-	err = res.Body.Close()
-
-	if err != nil {
-		return fmt.Errorf("body close err %w", err)
 	}
 
 	return nil
@@ -107,16 +125,24 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 	req.Header.Add("Content-encoding", "gzip")
 	req.Header.Add("Accept-encoding", "gzip")
 
-	// пока тело ответа нам не нужно
-	res, err := http.DefaultClient.Do(req)
+	retryable := func() error {
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return err
+		}
+
+		err = res.Body.Close()
+		if err != nil {
+			return fmt.Errorf("body close err %w", err)
+		}
+
+		return nil
+	}
+	err = backoff.Retry(retryable, c.retry)
+
 	if err != nil {
 		fmt.Println(fmt.Errorf("do request err %w", err))
 		return nil
-	}
-
-	err = res.Body.Close()
-	if err != nil {
-		return fmt.Errorf("body close err %w", err)
 	}
 
 	return nil

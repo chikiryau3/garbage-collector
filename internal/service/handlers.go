@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	metricscollector "github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	"github.com/go-chi/chi/v5"
 	"net/http"
 	"strconv"
@@ -16,9 +17,9 @@ func (s *service) ValueHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	metricValue, err := s.collector.GetMetric(mdata.ID)
+	metricValue, err := s.collector.GetMetric(mdata.MType, mdata.ID)
 	if err != nil {
-		s.log.Error("ValueHandler get metric error", err)
+		//s.log.Error("ValueHandler get metric error", err)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -155,7 +156,7 @@ func (s *service) GaugeHandler(w http.ResponseWriter, r *http.Request) {
 func (s *service) GetMetric(w http.ResponseWriter, r *http.Request) {
 	mdata := extractMetricsData(r)
 
-	val, err := s.collector.GetMetric(mdata.name)
+	val, err := s.collector.GetMetric(mdata.mtype, mdata.name)
 	if err != nil {
 		s.log.Error("GetMetric error", err)
 		w.WriteHeader(http.StatusNotFound)
@@ -170,5 +171,31 @@ func (s *service) GetMetric(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-type", "text/plain")
+	w.WriteHeader(http.StatusOK)
+}
+
+func (s *service) BatchUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	var batch []metricscollector.Metrics
+	if err := ReadJSONBody(r.Body, &batch); err != nil {
+		s.log.Error("UpdateHandler body parsing error", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	updatedBatch, err := s.collector.SetBatch(batch)
+	if err != nil {
+		s.log.Error("BatchUpdateHandler error", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-type", "application/json")
+
+	err = WriteJSONBody(w, updatedBatch)
+	if err != nil {
+		s.log.Error("UpdateHandler response writing error", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 }

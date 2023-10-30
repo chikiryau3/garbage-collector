@@ -7,7 +7,7 @@ package mocks
 import (
 	reflect "reflect"
 
-	memstorage "github.com/chikiryau3/garbage-collector/internal/memStorage"
+	metricscollector "github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -35,25 +35,25 @@ func (m *MetricsCollectorMock) EXPECT() *MetricsCollectorMockMockRecorder {
 }
 
 // GetMetric mocks base method.
-func (m *MetricsCollectorMock) GetMetric(name string) (any, error) {
+func (m *MetricsCollectorMock) GetMetric(mtype, name string) (any, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMetric", name)
+	ret := m.ctrl.Call(m, "GetMetric", mtype, name)
 	ret0, _ := ret[0].(any)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetMetric indicates an expected call of GetMetric.
-func (mr *MetricsCollectorMockMockRecorder) GetMetric(name interface{}) *gomock.Call {
+func (mr *MetricsCollectorMockMockRecorder) GetMetric(mtype, name interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMetric", reflect.TypeOf((*MetricsCollectorMock)(nil).GetMetric), name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMetric", reflect.TypeOf((*MetricsCollectorMock)(nil).GetMetric), mtype, name)
 }
 
 // ReadStorage mocks base method.
-func (m *MetricsCollectorMock) ReadStorage() (*memstorage.StorageData, error) {
+func (m *MetricsCollectorMock) ReadStorage() (*metricscollector.StorageData, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ReadStorage")
-	ret0, _ := ret[0].(*memstorage.StorageData)
+	ret0, _ := ret[0].(*metricscollector.StorageData)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -62,6 +62,21 @@ func (m *MetricsCollectorMock) ReadStorage() (*memstorage.StorageData, error) {
 func (mr *MetricsCollectorMockMockRecorder) ReadStorage() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadStorage", reflect.TypeOf((*MetricsCollectorMock)(nil).ReadStorage))
+}
+
+// SetBatch mocks base method.
+func (m *MetricsCollectorMock) SetBatch(batch []metricscollector.Metrics) (*[]metricscollector.Metrics, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetBatch", batch)
+	ret0, _ := ret[0].(*[]metricscollector.Metrics)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SetBatch indicates an expected call of SetBatch.
+func (mr *MetricsCollectorMockMockRecorder) SetBatch(batch interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetBatch", reflect.TypeOf((*MetricsCollectorMock)(nil).SetBatch), batch)
 }
 
 // SetCount mocks base method.
@@ -92,4 +107,71 @@ func (m *MetricsCollectorMock) SetGauge(name string, value float64) (float64, er
 func (mr *MetricsCollectorMockMockRecorder) SetGauge(name, value interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetGauge", reflect.TypeOf((*MetricsCollectorMock)(nil).SetGauge), name, value)
+}
+
+// MockStorage is a mock of Storage interface.
+type MockStorage struct {
+	ctrl     *gomock.Controller
+	recorder *MockStorageMockRecorder
+}
+
+// MockStorageMockRecorder is the mock recorder for MockStorage.
+type MockStorageMockRecorder struct {
+	mock *MockStorage
+}
+
+// NewMockStorage creates a new mock instance.
+func NewMockStorage(ctrl *gomock.Controller) *MockStorage {
+	mock := &MockStorage{ctrl: ctrl}
+	mock.recorder = &MockStorageMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockStorage) EXPECT() *MockStorageMockRecorder {
+	return m.recorder
+}
+
+// GetData mocks base method.
+func (m *MockStorage) GetData() (*metricscollector.StorageData, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetData")
+	ret0, _ := ret[0].(*metricscollector.StorageData)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetData indicates an expected call of GetData.
+func (mr *MockStorageMockRecorder) GetData() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetData", reflect.TypeOf((*MockStorage)(nil).GetData))
+}
+
+// ReadMetric mocks base method.
+func (m *MockStorage) ReadMetric(mtype, name string) (any, bool) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ReadMetric", mtype, name)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(bool)
+	return ret0, ret1
+}
+
+// ReadMetric indicates an expected call of ReadMetric.
+func (mr *MockStorageMockRecorder) ReadMetric(mtype, name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadMetric", reflect.TypeOf((*MockStorage)(nil).ReadMetric), mtype, name)
+}
+
+// WriteMetric mocks base method.
+func (m *MockStorage) WriteMetric(mtype, name string, value any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WriteMetric", mtype, name, value)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WriteMetric indicates an expected call of WriteMetric.
+func (mr *MockStorageMockRecorder) WriteMetric(mtype, name, value interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteMetric", reflect.TypeOf((*MockStorage)(nil).WriteMetric), mtype, name, value)
 }
