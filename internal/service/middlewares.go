@@ -1,10 +1,12 @@
 package service
 
 import (
-	"compress/gzip"
+	"bytes"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/base64"
 	"io"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -23,95 +25,69 @@ func (s *service) WithLogging(next http.Handler) http.Handler {
 			"uri", uri,
 			"method", method,
 			"duration", duration,
+			//"req hash", r.Header.Get("HashSHA256"),
+			//"res hash", w.Header().Get("HashSHA256"),
 		)
 	})
 }
 
-type compressWriter struct {
-	w  http.ResponseWriter
-	zw *gzip.Writer
+type signWriter struct {
+	w   http.ResponseWriter
+	key string
 }
 
-func newCompressWriter(w http.ResponseWriter) *compressWriter {
-	return &compressWriter{
-		w:  w,
-		zw: gzip.NewWriter(w),
+func newSignWriter(w http.ResponseWriter, key string) *signWriter {
+	return &signWriter{
+		w,
+		key,
 	}
 }
 
-func (c *compressWriter) Header() http.Header {
-	return c.w.Header()
+func (sw *signWriter) Write(p []byte) (int, error) {
+	hash := hmac.New(sha256.New, []byte(sw.key))
+	hash.Write(p)
+
+	sw.w.Header().Add("HashSHA256", base64.URLEncoding.EncodeToString(hash.Sum(nil)))
+
+	return sw.w.Write(p)
 }
 
-func (c *compressWriter) Write(p []byte) (int, error) {
-	return c.zw.Write(p)
+func (sw *signWriter) Header() http.Header {
+	return sw.w.Header()
 }
 
-func (c *compressWriter) WriteHeader(statusCode int) {
-	if statusCode < 300 {
-		c.w.Header().Set("Content-Encoding", "gzip")
-	}
-	c.w.WriteHeader(statusCode)
+func (sw *signWriter) WriteHeader(statusCode int) {
+	sw.w.WriteHeader(statusCode)
 }
 
-func (c *compressWriter) Close() error {
-	return c.zw.Close()
-}
-
-type compressReader struct {
-	r  io.ReadCloser
-	zr *gzip.Reader
-}
-
-func newCompressReader(r io.ReadCloser) (*compressReader, error) {
-	zr, err := gzip.NewReader(r)
-	if err != nil {
-		return nil, err
-	}
-
-	return &compressReader{
-		r:  r,
-		zr: zr,
-	}, nil
-}
-
-func (c compressReader) Read(p []byte) (n int, err error) {
-	return c.zr.Read(p)
-}
-
-func (c *compressReader) Close() error {
-	if err := c.r.Close(); err != nil {
-		return err
-	}
-	return c.zr.Close()
-}
-
-func GzipMiddleware(h http.Handler) http.Handler {
+func (s *service) WithSignCheck(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ow := w
-
-		acceptEncoding := r.Header.Get("Accept-Encoding")
-		supportsGzip := strings.Contains(acceptEncoding, "gzip")
-		if supportsGzip {
-			cw := newCompressWriter(w)
-			ow = cw
-			w.Header().Add("Content-Encoding", "gzip")
-
-			defer cw.Close()
+		if s.config.Key == "" {
+			next.ServeHTTP(w, r)
+			return
 		}
 
-		contentEncoding := r.Header.Get("Content-Encoding")
-		sendsGzip := strings.Contains(contentEncoding, "gzip")
-		if sendsGzip {
-			cr, err := newCompressReader(r.Body)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			r.Body = cr
-			defer cr.Close()
+		hash := hmac.New(sha256.New, []byte(s.config.Key))
+		var body bytes.Buffer
+		_, err := body.ReadFrom(r.Body)
+		if err != nil {
+			s.log.Error("body parsing error", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
 		}
 
-		h.ServeHTTP(ow, r)
+		hash.Write(body.Bytes())
+
+		rSign, err := base64.URLEncoding.DecodeString(r.Header.Get("HashSHA256"))
+
+		if !hmac.Equal(hash.Sum(nil), rSign) {
+			s.log.Error("invalid request signature")
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		r.Body = io.NopCloser(bytes.NewBuffer(body.Bytes()))
+
+		next.ServeHTTP(newSignWriter(w, s.config.Key), r)
 	})
 }

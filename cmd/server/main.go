@@ -7,7 +7,9 @@ import (
 	"github.com/chikiryau3/garbage-collector/internal/logger"
 	"github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	service2 "github.com/chikiryau3/garbage-collector/internal/service"
+	"github.com/chikiryau3/garbage-collector/internal/utils"
 	"github.com/go-chi/chi/v5"
+	_ "github.com/go-chi/chi/v5/middleware"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"net/http"
 )
@@ -38,11 +40,14 @@ func main() {
 	}
 
 	collector := metricscollector.New(storage)
-	service := service2.New(collector, log)
+	service := service2.New(collector, log, &service2.Config{Key: config.APIKey})
 
 	router := chi.NewRouter()
 	router.Use(service.WithLogging)
-	router.Use(service2.GzipMiddleware)
+	router.Use(utils.GzipMiddleware)
+	//router.Use(middleware.NewCompressor())
+
+	router.Use(service.WithSignCheck)
 
 	router.Route(`/update`, func(r chi.Router) {
 		r.Post(`/`, service.UpdateHandler)

@@ -19,11 +19,16 @@ type Client interface {
 }
 
 type client struct {
-	serviceURL string
-	retry      backoff.BackOff
+	config *Config
+	retry  backoff.BackOff
 }
 
-func New(serviceURL string) Client {
+type Config struct {
+	ServiceURL string
+	APIKey     string
+}
+
+func New(c *Config) Client {
 	r := &utils.Retry{
 		InitInterval:  time.Second,
 		RetryTimeout:  time.Minute,
@@ -31,8 +36,8 @@ func New(serviceURL string) Client {
 	}
 
 	return &client{
-		retry:      r.NewExponentialBackOff(),
-		serviceURL: serviceURL,
+		retry:  r.NewExponentialBackOff(),
+		config: c,
 	}
 }
 
@@ -58,7 +63,7 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 
 	req, err := http.NewRequest(
 		http.MethodPost,
-		c.serviceURL+`/update/`,
+		c.config.ServiceURL+`/update/`,
 		&buf,
 	)
 
@@ -69,6 +74,10 @@ func (c *client) SendGauge(metricName string, metricValue float64) error {
 	req.Header.Add("Content-type", "application/json")
 	req.Header.Add("Content-encoding", "gzip")
 	req.Header.Add("Accept-encoding", "gzip")
+
+	if c.config.APIKey != "" {
+		c.AddSignature(req, body)
+	}
 
 	retryable := func() error {
 		res, err := http.DefaultClient.Do(req)
@@ -114,7 +123,7 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 	}
 	req, err := http.NewRequest(
 		http.MethodPost,
-		c.serviceURL+`/update/`,
+		c.config.ServiceURL+`/update/`,
 		&buf,
 	)
 	if err != nil {
@@ -124,6 +133,10 @@ func (c *client) SendCounter(metricName string, metricValue int64) error {
 	req.Header.Add("Content-type", "application/json")
 	req.Header.Add("Content-encoding", "gzip")
 	req.Header.Add("Accept-encoding", "gzip")
+
+	if c.config.APIKey != "" {
+		c.AddSignature(req, body)
+	}
 
 	retryable := func() error {
 		res, err := http.DefaultClient.Do(req)

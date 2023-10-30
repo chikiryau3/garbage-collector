@@ -23,12 +23,12 @@ func main() {
 
 	storage := memstorage.New(memstorage.DefaultConfig)
 	collector := metricscollector.New(storage)
-	collectionServiceClient := garbagecollector.New(`http://` + config.ServerEndpoint)
+	collectionServiceClient := garbagecollector.New(config.CollectorClientConfig)
 
 	metricsAgent := agent.New(
 		collector,
 		collectionServiceClient,
-		config,
+		config.AgentConfig,
 		log,
 	)
 
