@@ -12,6 +12,7 @@ import (
 	_ "github.com/go-chi/chi/v5/middleware"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -22,6 +23,9 @@ func main() {
 	}
 
 	config := configs.LoadServiceConfig()
+
+	log.Infoln("CONFIG", config)
+	log.Infoln("ENV", os.Environ())
 
 	db, err := common.InitPgConnection(config.DatabaseDSN)
 	if err != nil {
