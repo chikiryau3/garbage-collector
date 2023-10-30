@@ -3,6 +3,7 @@ package configs
 import (
 	"flag"
 	"github.com/chikiryau3/garbage-collector/internal/agent"
+	garbagecollector "github.com/chikiryau3/garbage-collector/internal/clients/garbage-collector"
 	"os"
 	"strconv"
 	"time"
@@ -12,19 +13,27 @@ type AgentCLIArgs struct {
 	serverEndpoint *string
 	reportInterval *int64
 	pollInterval   *int64
+	APIKey         *string
 }
 
 type AgentConfig struct {
 	ServerEndpoint string
 	ReportInterval int64
 	PollInterval   int64
+	APIKey         string
 }
 
-func LoadAgentConfig() agent.Config {
+type AgentConfigParsed struct {
+	AgentConfig           *agent.Config
+	CollectorClientConfig *garbagecollector.Config
+}
+
+func LoadAgentConfig() AgentConfigParsed {
 	args := &AgentCLIArgs{
 		serverEndpoint: flag.String("a", "localhost:8080", "service endpoint"),
 		reportInterval: flag.Int64("r", 10, "report interval (seconds)"),
 		pollInterval:   flag.Int64("p", 2, "poll interval (seconds)"),
+		APIKey:         flag.String("k", "", "api key"),
 	}
 
 	flag.Parse()
@@ -35,6 +44,12 @@ func LoadAgentConfig() agent.Config {
 		config.ServerEndpoint = endpoint
 	} else {
 		config.ServerEndpoint = *args.serverEndpoint
+	}
+
+	if key, ok := os.LookupEnv(`KEY`); ok {
+		config.APIKey = key
+	} else {
+		config.APIKey = *args.APIKey
 	}
 
 	if pollInterval, ok := os.LookupEnv(`POLL_INTERVAL`); ok {
@@ -59,9 +74,14 @@ func LoadAgentConfig() agent.Config {
 		config.ReportInterval = *args.reportInterval
 	}
 
-	return agent.Config{
-		ServerEndpoint: config.ServerEndpoint,
-		PollInterval:   time.Second * time.Duration(config.PollInterval),
-		ReportInterval: time.Second * time.Duration(config.ReportInterval),
+	return AgentConfigParsed{
+		&agent.Config{
+			PollInterval:   time.Second * time.Duration(config.PollInterval),
+			ReportInterval: time.Second * time.Duration(config.ReportInterval),
+		},
+		&garbagecollector.Config{
+			ServiceURL: `http://` + config.ServerEndpoint,
+			APIKey:     config.APIKey,
+		},
 	}
 }

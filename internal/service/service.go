@@ -14,11 +14,17 @@ type MetricData struct {
 type service struct {
 	collector metricscollector.MetricsCollector
 	log       logger.Logger
+	config    *Config
 }
 
-func New(collector metricscollector.MetricsCollector, log logger.Logger) *service {
+type Config struct {
+	Key string
+}
+
+func New(collector metricscollector.MetricsCollector, log logger.Logger, c *Config) *service {
 	return &service{
 		collector: collector,
 		log:       log,
+		config:    c,
 	}
 }

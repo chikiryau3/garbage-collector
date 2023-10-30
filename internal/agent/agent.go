@@ -8,7 +8,6 @@ import (
 )
 
 type Config struct {
-	ServerEndpoint string
 	PollInterval   time.Duration
 	ReportInterval time.Duration
 }
@@ -16,11 +15,11 @@ type Config struct {
 type agent struct {
 	collector               metricscollector.MetricsCollector
 	collectionServiceClient garbagecollector.Client
-	config                  Config
+	config                  *Config
 	log                     logger.Logger
 }
 
-func New(c metricscollector.MetricsCollector, sc garbagecollector.Client, config Config, log logger.Logger) *agent {
+func New(c metricscollector.MetricsCollector, sc garbagecollector.Client, config *Config, log logger.Logger) *agent {
 	return &agent{
 		collector:               c,
 		collectionServiceClient: sc,

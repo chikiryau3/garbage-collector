@@ -44,8 +44,7 @@ func Test_agent_pollMetrics(t *testing.T) {
 	a := &agent{
 		collector:               collectorMock,
 		collectionServiceClient: collectionServiceClientMock,
-		config: Config{
-			`/`,
+		config: &Config{
 			pollInterval,
 			reportInterval,
 		},
@@ -96,8 +95,7 @@ func Test_agent_sendReport(t *testing.T) {
 	a := &agent{
 		collector:               collectorMock,
 		collectionServiceClient: collectionServiceClientMock,
-		config: Config{
-			`/`,
+		config: &Config{
 			pollInterval,
 			reportInterval,
 		},

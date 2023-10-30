@@ -15,6 +15,7 @@ type ServiceConfig struct {
 	Endpoint        string
 	StorageConfig   *memstorage.Config
 	DatabaseDSN     string
+	APIKey          string
 }
 
 type ServiceCLIArgs struct {
@@ -23,6 +24,7 @@ type ServiceCLIArgs struct {
 	restore         *bool
 	endpoint        *string
 	databaseDSN     *string
+	APIKey          *string
 }
 
 func LoadServiceConfig() *ServiceConfig {
@@ -32,6 +34,7 @@ func LoadServiceConfig() *ServiceConfig {
 		storeInterval:   flag.Int64("i", 300, "store interval (seconds)"),
 		restore:         flag.Bool("r", true, "should restore from file (bool)"),
 		databaseDSN:     flag.String("d", "", "databaseDSN connection string"),
+		APIKey:          flag.String("k", "", "api key"),
 	}
 
 	flag.Parse()
@@ -71,6 +74,12 @@ func LoadServiceConfig() *ServiceConfig {
 		config.DatabaseDSN = databaseDSN
 	} else {
 		config.DatabaseDSN = *args.databaseDSN
+	}
+
+	if key, ok := os.LookupEnv(`KEY`); ok {
+		config.APIKey = key
+	} else {
+		config.APIKey = *args.APIKey
 	}
 
 	config.StorageConfig = &memstorage.Config{
