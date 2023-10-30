@@ -80,7 +80,7 @@ func (s *service) WithSignCheck(next http.Handler) http.Handler {
 
 		rSign, _ := base64.URLEncoding.DecodeString(r.Header.Get("HashSHA256"))
 
-		s.log.Infoln("BODY", body.String())
+		s.log.Infoln("BODY", body.String(), "HEADER", r.Header.Get("HashSHA256"))
 		s.log.Infoln("BODY HASH", hash.Sum(nil), "HEADER HASH", rSign)
 
 		if !hmac.Equal(hash.Sum(nil), rSign) {
