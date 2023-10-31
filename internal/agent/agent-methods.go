@@ -124,7 +124,7 @@ func (a *agent) sendReport() error {
 			}
 		}
 
-		time.Sleep(100 * time.Millisecond)
+		//time.Sleep(100 * time.Millisecond)
 	}
 
 	return nil
