@@ -10,6 +10,7 @@ import (
 type Config struct {
 	PollInterval   time.Duration
 	ReportInterval time.Duration
+	RateLimit      int64
 }
 
 type agent struct {
