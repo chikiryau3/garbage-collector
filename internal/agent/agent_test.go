@@ -23,6 +23,7 @@ func Test_agent_pollMetrics(t *testing.T) {
 	collectionServiceClientMock := mocks.NewGarbageCollectorMock(ctrl)
 	pollInterval := time.Second * 2
 	reportInterval := time.Second * 10
+	rateLimit := int64(10)
 
 	tests := []struct {
 		name           string
@@ -47,6 +48,7 @@ func Test_agent_pollMetrics(t *testing.T) {
 		config: &Config{
 			pollInterval,
 			reportInterval,
+			rateLimit,
 		},
 	}
 
@@ -68,6 +70,8 @@ func Test_agent_sendReport(t *testing.T) {
 	collectionServiceClientMock := mocks.NewGarbageCollectorMock(ctrl)
 	pollInterval := time.Second * 2
 	reportInterval := time.Second * 10
+	rateLimit := int64(10)
+	errs := make(chan error)
 
 	storageData := &metricscollector.StorageData{
 		"gauge:someGaugeMetric":  rand.Float64(),
@@ -98,13 +102,16 @@ func Test_agent_sendReport(t *testing.T) {
 		config: &Config{
 			pollInterval,
 			reportInterval,
+			rateLimit,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.expectationsFn()
-			if err := a.sendReport(); (err != nil) != tt.wantErr {
+			a.sendReport(errs)
+			err := <-errs
+			if (err != nil) != tt.wantErr {
 				t.Errorf("pollMetrics() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

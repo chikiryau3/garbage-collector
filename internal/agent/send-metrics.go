@@ -5,8 +5,6 @@ import (
 )
 
 func (a *agent) sendMetric(mdata Metric) error {
-	fmt.Printf("METRIC %s\n", mdata.name)
-
 	if mdata.mtype == `gauge` {
 		metricValue, ok := mdata.value.(float64)
 		if !ok {
