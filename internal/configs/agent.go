@@ -14,6 +14,7 @@ type AgentCLIArgs struct {
 	reportInterval *int64
 	pollInterval   *int64
 	APIKey         *string
+	rateLimit      *int64
 }
 
 type AgentConfig struct {
@@ -21,6 +22,7 @@ type AgentConfig struct {
 	ReportInterval int64
 	PollInterval   int64
 	APIKey         string
+	RateLimit      int64
 }
 
 type AgentConfigParsed struct {
@@ -34,6 +36,7 @@ func LoadAgentConfig() AgentConfigParsed {
 		reportInterval: flag.Int64("r", 10, "report interval (seconds)"),
 		pollInterval:   flag.Int64("p", 2, "poll interval (seconds)"),
 		APIKey:         flag.String("k", "", "api key"),
+		rateLimit:      flag.Int64("l", 10, "send metrics rate limit"),
 	}
 
 	flag.Parse()
@@ -74,10 +77,22 @@ func LoadAgentConfig() AgentConfigParsed {
 		config.ReportInterval = *args.reportInterval
 	}
 
+	if rateLimit, ok := os.LookupEnv(`RATE_LIMIT`); ok {
+		rateLimitParsed, err := strconv.ParseInt(rateLimit, 10, 8)
+		if err != nil {
+			config.RateLimit = *args.rateLimit
+		} else {
+			config.RateLimit = rateLimitParsed
+		}
+	} else {
+		config.RateLimit = *args.rateLimit
+	}
+
 	return AgentConfigParsed{
 		&agent.Config{
 			PollInterval:   time.Second * time.Duration(config.PollInterval),
 			ReportInterval: time.Second * time.Duration(config.ReportInterval),
+			RateLimit:      config.RateLimit,
 		},
 		&garbagecollector.Config{
 			ServiceURL: `http://` + config.ServerEndpoint,

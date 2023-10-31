@@ -20,8 +20,6 @@ func main() {
 	}
 
 	config := configs.LoadAgentConfig()
-	log.Infoln("AGENT CONFIG", config)
-	log.Infoln("AGENT ENV", os.Environ())
 
 	storage := memstorage.New(memstorage.DefaultConfig)
 	collector := metricscollector.New(storage)

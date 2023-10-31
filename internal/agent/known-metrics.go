@@ -1,5 +1,7 @@
 package agent
 
+import "encoding/json"
+
 type RuntimeMetrics struct {
 	Alloc         uint64  `json:"Alloc"`
 	BuckHashSys   uint64  `json:"BuckHashSys"`
@@ -28,4 +30,32 @@ type RuntimeMetrics struct {
 	StackSys      uint64  `json:"StackSys"`
 	Sys           uint64  `json:"Sys"`
 	TotalAlloc    uint64  `json:"TotalAlloc"`
+}
+
+// хак с фильтрацией ненужных полей (первое что в голову пришло)
+// не уверен в том, что это нормально перформит, но не хотелось вручную все метрики разбирать
+func filterFields(data interface{}) (map[string]any, error) {
+	var stats RuntimeMetrics
+	statsJSON, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(statsJSON, &stats)
+	if err != nil {
+		return nil, err
+	}
+
+	var filteredMap map[string]any
+	statsJSON, err = json.Marshal(stats)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(statsJSON, &filteredMap)
+	if err != nil {
+		return nil, err
+	}
+
+	return filteredMap, nil
 }
