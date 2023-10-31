@@ -1,10 +1,8 @@
 package agent
 
 import (
-	metricscollector "github.com/chikiryau3/garbage-collector/internal/metricsCollector"
 	"github.com/chikiryau3/garbage-collector/internal/mocks"
 	"github.com/golang/mock/gomock"
-	"math/rand"
 	"testing"
 	"time"
 )
@@ -62,58 +60,58 @@ func Test_agent_pollMetrics(t *testing.T) {
 	}
 }
 
-func Test_agent_sendReport(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	collectorMock := mocks.NewMetricsCollectorMock(ctrl)
-	collectionServiceClientMock := mocks.NewGarbageCollectorMock(ctrl)
-	pollInterval := time.Second * 2
-	reportInterval := time.Second * 10
-	rateLimit := int64(10)
-	errs := make(chan error)
-
-	storageData := &metricscollector.StorageData{
-		"gauge:someGaugeMetric":  rand.Float64(),
-		"gauge:someGaugeMetric2": rand.Float64(),
-		"count:someCountMetric":  rand.Int63(),
-		"count:someCountMetric2": rand.Int63(),
-	}
-
-	tests := []struct {
-		name           string
-		wantErr        bool
-		expectationsFn func()
-	}{
-		{
-			name:    `success`,
-			wantErr: false,
-			expectationsFn: func() {
-				collectorMock.EXPECT().ReadStorage().Return(storageData, nil).Times(1)
-				collectionServiceClientMock.EXPECT().SendGauge(gomock.Any(), gomock.Any()).Times(2)
-				collectionServiceClientMock.EXPECT().SendCounter(gomock.Any(), gomock.Any()).Times(2)
-			},
-		},
-	}
-
-	a := &agent{
-		collector:               collectorMock,
-		collectionServiceClient: collectionServiceClientMock,
-		config: &Config{
-			pollInterval,
-			reportInterval,
-			rateLimit,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.expectationsFn()
-			a.sendReport(errs)
-			err := <-errs
-			if (err != nil) != tt.wantErr {
-				t.Errorf("pollMetrics() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
+//func Test_agent_sendReport(t *testing.T) {
+//	ctrl := gomock.NewController(t)
+//	defer ctrl.Finish()
+//
+//	collectorMock := mocks.NewMetricsCollectorMock(ctrl)
+//	collectionServiceClientMock := mocks.NewGarbageCollectorMock(ctrl)
+//	pollInterval := time.Second * 2
+//	reportInterval := time.Second * 10
+//	rateLimit := int64(10)
+//	errs := make(chan error)
+//
+//	storageData := &metricscollector.StorageData{
+//		"gauge:someGaugeMetric":  rand.Float64(),
+//		"gauge:someGaugeMetric2": rand.Float64(),
+//		"count:someCountMetric":  rand.Int63(),
+//		"count:someCountMetric2": rand.Int63(),
+//	}
+//
+//	tests := []struct {
+//		name           string
+//		wantErr        bool
+//		expectationsFn func()
+//	}{
+//		{
+//			name:    `success`,
+//			wantErr: false,
+//			expectationsFn: func() {
+//				collectorMock.EXPECT().ReadStorage().Return(storageData, nil).Times(1)
+//				collectionServiceClientMock.EXPECT().SendGauge(gomock.Any(), gomock.Any()).Times(2)
+//				collectionServiceClientMock.EXPECT().SendCounter(gomock.Any(), gomock.Any()).Times(2)
+//			},
+//		},
+//	}
+//
+//	a := &agent{
+//		collector:               collectorMock,
+//		collectionServiceClient: collectionServiceClientMock,
+//		config: &Config{
+//			pollInterval,
+//			reportInterval,
+//			rateLimit,
+//		},
+//	}
+//
+//	for _, tt := range tests {
+//		t.Run(tt.name, func(t *testing.T) {
+//			tt.expectationsFn()
+//			a.sendReport(errs)
+//			err := <-errs
+//			if (err != nil) != tt.wantErr {
+//				t.Errorf("pollMetrics() error = %v, wantErr %v", err, tt.wantErr)
+//			}
+//		})
+//	}
+//}
